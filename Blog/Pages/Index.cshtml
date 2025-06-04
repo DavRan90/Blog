@@ -55,10 +55,13 @@
                             @* <button>↑</button> *@
                             <a asp-route-moveIdUp="@i" class="btn btn-primary float-start border">↑</a>
                             <a asp-route-moveIdDown="@i" class="btn btn-primary float-start border">↓</a>
-                            <textarea asp-for="Text.Content" cols="28" rows="5" placeholder="@element.Content"></textarea>
+                            <form method="post" enctype="multipart/form-data">
+                            <textarea asp-for="EditText.Content" cols="28" rows="5" placeholder="@element.Content"></textarea>
                             @* <p class="card-text linebreak d-inline">@element.Content </p> *@
                             <a asp-route-removeElement="@i" class="btn btn-danger float-end border">X</a>
-                            <a asp-route-editElement="@i" class="btn btn-success float-end border">✓</a>
+                            @* <a asp-route-editElement="@i" class="btn btn-success float-end border">✓</a> *@
+                                <input type="submit" class="btn btn-success float-end border" value="✓" />
+                            </form>
                             <br />
                         </div>
                     }

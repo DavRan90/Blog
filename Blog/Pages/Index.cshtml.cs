@@ -27,6 +27,9 @@ public class IndexModel : PageModel
     public Models.Text Text { get; set; }
 
     [BindProperty]
+    public Models.Text EditText { get; set; }
+
+    [BindProperty]
     public Models.Image Image { get; set; }
 
     [BindProperty]
@@ -47,6 +50,8 @@ public class IndexModel : PageModel
             Models.Element elementToBeRemoved = await _context.Elements.Where(e => e.Position == removeElement).SingleOrDefaultAsync();
             _context.Elements.Remove(elementToBeRemoved);
             await _context.SaveChangesAsync();
+
+            // Re-arrange positions
             List<Models.Element> listOfElements = await _context.Elements.OrderBy(e => e.Position).ToListAsync();
             int index = 1;
             foreach (var element in listOfElements)
@@ -57,10 +62,11 @@ public class IndexModel : PageModel
             await _context.SaveChangesAsync();
         }
 
-        //if(editElement > 0)
+        //if (editElement > 0)
         //{
         //    Models.Element elementToBeEdited = await _context.Elements.Where(e => e.Position == editElement).SingleOrDefaultAsync();
-        //    elementToBeEdited.Content = Title.Content;
+        //    elementToBeEdited.Content = "EditText.Content";
+        //    _context.Elements.Update(elementToBeEdited);
         //    await _context.SaveChangesAsync();
         //}
 
@@ -160,6 +166,17 @@ public class IndexModel : PageModel
             _context.Elements.Add(Text);
             await _context.SaveChangesAsync();
         }
+        if (EditText != null)
+        {
+            if (Text.Content != EditText.Content)
+            {
+                Text.Content = EditText.Content;
+                _context.Elements.Update(Text);
+                await _context.SaveChangesAsync();
+                return RedirectToPage("./Index");
+            }
+        }
+        
 
         return RedirectToPage("./Index");
     }
