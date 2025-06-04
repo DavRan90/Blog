@@ -4,6 +4,7 @@ using Blog.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Blog.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250604121534_NewDB2")]
+    partial class NewDB2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -26,52 +29,42 @@ namespace Blog.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("Relational:JsonPropertyName", "id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "content");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ElementType")
-                        .HasColumnType("int")
-                        .HasAnnotation("Relational:JsonPropertyName", "elementType");
+                        .HasColumnType("int");
 
                     b.Property<int?>("Position")
-                        .HasColumnType("int")
-                        .HasAnnotation("Relational:JsonPropertyName", "position");
+                        .HasColumnType("int");
 
                     b.Property<int?>("SiteId")
-                        .HasColumnType("int")
-                        .HasAnnotation("Relational:JsonPropertyName", "siteId");
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("SiteId");
 
                     b.ToTable("Elements");
-
-                    b.HasAnnotation("Relational:JsonPropertyName", "elements");
                 });
 
             modelBuilder.Entity("Blog.Models.Site", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("Relational:JsonPropertyName", "id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("Date")
-                        .HasColumnType("datetime2")
-                        .HasAnnotation("Relational:JsonPropertyName", "date");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "userId");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

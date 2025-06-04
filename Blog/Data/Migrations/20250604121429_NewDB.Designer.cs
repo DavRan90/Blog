@@ -4,6 +4,7 @@ using Blog.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Blog.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250604121429_NewDB")]
+    partial class NewDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -26,26 +29,23 @@ namespace Blog.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("Relational:JsonPropertyName", "id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "content");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ElementType")
-                        .HasColumnType("int")
-                        .HasAnnotation("Relational:JsonPropertyName", "elementType");
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
 
                     b.Property<int?>("Position")
-                        .HasColumnType("int")
-                        .HasAnnotation("Relational:JsonPropertyName", "position");
+                        .HasColumnType("int");
 
                     b.Property<int?>("SiteId")
-                        .HasColumnType("int")
-                        .HasAnnotation("Relational:JsonPropertyName", "siteId");
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -53,25 +53,24 @@ namespace Blog.Data.Migrations
 
                     b.ToTable("Elements");
 
-                    b.HasAnnotation("Relational:JsonPropertyName", "elements");
+                    b.HasDiscriminator().HasValue("Element");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Blog.Models.Site", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("Relational:JsonPropertyName", "id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("Date")
-                        .HasColumnType("datetime2")
-                        .HasAnnotation("Relational:JsonPropertyName", "date");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "userId");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -278,6 +277,27 @@ namespace Blog.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Blog.Models.Image", b =>
+                {
+                    b.HasBaseType("Blog.Models.Element");
+
+                    b.HasDiscriminator().HasValue("Image");
+                });
+
+            modelBuilder.Entity("Blog.Models.Text", b =>
+                {
+                    b.HasBaseType("Blog.Models.Element");
+
+                    b.HasDiscriminator().HasValue("Text");
+                });
+
+            modelBuilder.Entity("Blog.Models.Title", b =>
+                {
+                    b.HasBaseType("Blog.Models.Element");
+
+                    b.HasDiscriminator().HasValue("Title");
                 });
 
             modelBuilder.Entity("Blog.Models.Element", b =>

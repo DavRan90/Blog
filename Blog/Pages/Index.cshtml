@@ -18,11 +18,12 @@
         foreach (var site in Model.Sites)
         {
             <div class="card m-2 cardsize">
+                <h2>Site: @Model.Sites[0].Id</h2>
                 @* @foreach (var element in Model.Elements) *@
                 @for (int i = 1; i <= Model.Elements.Count(); i++)
                 {
                     var element = Model.Elements.Where(e => e.Position == i).SingleOrDefault();
-                    if (element is Models.Image)
+                    if (element.ElementType == ElementTypes.Image)
                     {
                         <a asp-route-moveIdUp="@i" class="btn btn-primary">↑</a>
                         <img class="card-img-top" src="~/userImages/@element.Content" />
@@ -32,7 +33,7 @@
                     }
                     @* <div class="card-body"> *@
 
-                    else if (element is Models.Title)
+                    else if (element.ElementType == ElementTypes.Title)
                     {
 
                         <div class="border border-4">
@@ -49,7 +50,7 @@
                             <br />
                         </div>
                     }
-                    else if (element is Models.Text)
+                    else if (element.ElementType == ElementTypes.Text)
                     {
                         <div class="border border-4">
                             @* <button>↑</button> *@
@@ -87,9 +88,9 @@
                 <div><br /></div>
                 <div id="content">
                     <form method="post" enctype="multipart/form-data">
-                    <input asp-for="Title.Content" class="show" id="title" />
-                    <textarea asp-for="Text.Content" cols="28" rows="5" class="visually-hidden" id="text"></textarea>
-                    <input asp-for="UploadedImage" class="visually-hidden" id="image" />
+                    <input asp-for="AddTitle.Content" class="show" id="title" />
+                    <textarea asp-for="AddText.Content" cols="28" rows="5" class="visually-hidden" id="text"></textarea>
+                    <input asp-for="AddUploadedImage" class="visually-hidden" id="image" />
                     <br /><br />
                         <input type="submit" class="btn btn-primary" value="Lägg till element" />
                     </form>
