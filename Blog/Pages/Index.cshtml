@@ -1,0 +1,133 @@
+﻿@page
+@model IndexModel
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@{
+    ViewData["Title"] = "Home page";
+    var user = await UserManager.GetUserAsync(User);
+}
+
+<div class="text-center">
+    <h1 class="display-4">Bloggen</h1>
+
+</div>
+
+<div class="row">
+    @if (Model.Sites != null)
+    {
+        foreach (var site in Model.Sites)
+        {
+            <div class="card m-2 cardsize">
+                @* @foreach (var element in Model.Elements) *@
+                @for (int i = 1; i <= Model.Elements.Count(); i++)
+                {
+                    var element = Model.Elements.Where(e => e.Position == i).SingleOrDefault();
+                    if (element is Models.Image)
+                    {
+                        <a asp-route-moveIdUp="@i" class="btn btn-primary">↑</a>
+                        <img class="card-img-top" src="~/userImages/@element.Content" />
+                        <a asp-route-moveIdDown="@i" class="btn btn-primary">↓</a>
+                        <a asp-route-removeElement="@i" class="btn btn-danger">X</a>
+                        <br />
+                    }
+                    @* <div class="card-body"> *@
+
+                    else if (element is Models.Title)
+                    {
+
+                        <div class="border border-4">
+                            <a asp-route-moveIdUp="@i" class="btn btn-primary float-start border">↑</a>
+                            <a asp-route-moveIdDown="@i" class="btn btn-primary float-start border">↓</a>
+                            <form method="post" enctype="multipart/form-data">
+                            <input asp-for="Title.Content" value="@element.Content" />
+                            @* <h5 class="card-title d-inline">@element.Content </h5> *@
+                            <a asp-route-removeElement="@i" class="btn btn-danger float-end border">X</a>
+                            @* <a asp-route-editElement="@i" class="btn btn-success float-end border">✓</a> *@
+                                <input type="submit" class="btn btn-success float-end border" value="✓" />
+                            </form>
+                            
+                            <br />
+                        </div>
+                    }
+                    else if (element is Models.Text)
+                    {
+                        <div class="border border-4">
+                            @* <button>↑</button> *@
+                            <a asp-route-moveIdUp="@i" class="btn btn-primary float-start border">↑</a>
+                            <a asp-route-moveIdDown="@i" class="btn btn-primary float-start border">↓</a>
+                            <textarea asp-for="Text.Content" cols="28" rows="5" placeholder="@element.Content"></textarea>
+                            @* <p class="card-text linebreak d-inline">@element.Content </p> *@
+                            <a asp-route-removeElement="@i" class="btn btn-danger float-end border">X</a>
+                            <a asp-route-editElement="@i" class="btn btn-success float-end border">✓</a>
+                            <br />
+                        </div>
+                    }
+
+                    <br />
+
+
+                    @* @if (user != null && user.Id == element.UserId)
+                    {
+                        <a asp-route-deleteId="@site.Id" class="btn btn-primary">Ta bort</a>
+                    } *@
+                    @* </div> *@
+                    @* <p class="card-footer">@site.Date</p> *@
+                }
+                <label asp-for="ElementTypes">Lägg till element</label>
+                @* @Html.DropDownList("AddElement", Html.GetEnumSelectList<ElementTypes>()) *@
+                <select asp-for="ElementTypes"
+                        onchange="selectElement()"
+                        id="selectedElement"
+                        class="form-control"
+                        asp-items="Html.GetEnumSelectList<ElementTypes>()">
+                </select>
+                <div><br /></div>
+                <div id="content">
+                    <form method="post" enctype="multipart/form-data">
+                    <input asp-for="Title.Content" class="show" id="title" />
+                    <textarea asp-for="Text.Content" cols="28" rows="5" class="visually-hidden" id="text"></textarea>
+                    <input asp-for="UploadedImage" class="visually-hidden" id="image" />
+                    <br /><br />
+                        <input type="submit" class="btn btn-primary" value="Lägg till element" />
+                    </form>
+                </div>
+
+                <div><br /></div>
+                @* <a asp-route-addElement="1" class="btn btn-primary">Lägg till</a>
+
+                
+                
+                <select asp-for="@Model.SelectedValue" asp-items="Html.GetEnumSelectList<MyEnum>()"> 
+                <a asp-route-deleteId="@site.Id" class="btn btn-primary">Ta bort</a> *@
+            </div>
+        }
+
+    }
+</div>
+
+
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <p>Du är inloggad som @User.Identity.Name</p>
+    <form method="post" enctype="multipart/form-data">
+        <label asp-for="Title.Content"></label>
+        <br />
+        <input asp-for="Title.Content" />
+        <br />
+        <label asp-for="Text.Content"></label>
+        <br />
+        <textarea asp-for="Text.Content" cols="40" rows="5"></textarea>
+        <br />
+        <label asp-for="Image.Content"></label>
+        <br />
+        <input asp-for="UploadedImage" />
+        
+        <br /><br />
+        <input type="submit" class="btn-success" value="Spara inlägget" />
+    </form>
+}
+else
+{
+    <div class="alert alert-danger">Du är inte inloggad ännu!</div>
+}
