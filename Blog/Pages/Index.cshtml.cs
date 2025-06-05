@@ -30,6 +30,12 @@ public class IndexModel : PageModel
     public Models.Text EditText { get; set; }
 
     [BindProperty]
+    public Models.Text EditTitle { get; set; }
+
+    [BindProperty]
+    public Models.Text EditImage { get; set; }
+
+    [BindProperty]
     public Models.Image Image { get; set; }
 
     [BindProperty]
@@ -62,22 +68,27 @@ public class IndexModel : PageModel
         //Sites = await _context.Sites.ToListAsync();
 
 
-        //if (removeElement > 0)
-        //{
-        //    Models.Element elementToBeRemoved = await _context.Elements.Where(e => e.Position == removeElement).SingleOrDefaultAsync();
-        //    _context.Elements.Remove(elementToBeRemoved);
-        //    await _context.SaveChangesAsync();
+        if (removeElement > 0)
+        {
+            await DAL.ElementAPIManager.DeleteElement(removeElement);
+            //Models.Element elementToBeRemoved = await _context.Elements.Where(e => e.Id == removeElement).SingleOrDefaultAsync();
+            //_context.Elements.Remove(elementToBeRemoved);
+            //await _context.SaveChangesAsync();
 
-        //    // Re-arrange positions
-        //    List<Models.Element> listOfElements = await _context.Elements.OrderBy(e => e.Position).ToListAsync();
-        //    int index = 1;
-        //    foreach (var element in listOfElements)
-        //    {
-        //        element.Position = index;
-        //        index++;
-        //    }
-        //    await _context.SaveChangesAsync();
-        //}
+
+            // Re-arrange positions
+            List<Models.Element> listOfElements = await _context.Elements.OrderBy(e => e.Position).ToListAsync();
+            int index = 1;
+            foreach (var element in listOfElements)
+            {
+                element.Position = index;
+                index++;
+            }
+            await _context.SaveChangesAsync();
+        }
+
+        Sites = await DAL.SiteAPIManager.GetAllSites();
+        Elements = await DAL.ElementAPIManager.GetAllElements();
 
         //if (moveIdDown > 0 && moveIdDown < _context.Elements.Count())
         //{
@@ -166,6 +177,16 @@ public class IndexModel : PageModel
         //    _context.Elements.Add(Text);
         //    await _context.SaveChangesAsync();
         //}
+        if (AddTitle.Content != null)
+        {
+
+            Element newElement = new();
+            newElement.Content = AddTitle.Content;
+            newElement.SiteId = 1;
+            newElement.ElementType = ElementTypes.Title;
+            newElement.Position = _context.Elements.Count() + 1;
+            await DAL.ElementAPIManager.AddElement(newElement);
+        }
 
         if (AddText.Content != null)
         {
@@ -174,22 +195,31 @@ public class IndexModel : PageModel
             newElement.SiteId = 1;
             newElement.ElementType = ElementTypes.Text;
             newElement.Position = _context.Elements.Count() + 1;
-            //_context.Elements.Add(newElement);
-            //await _context.SaveChangesAsync();
-            DAL.ElementAPIManager.AddElement(newElement);
+            await DAL.ElementAPIManager.AddElement(newElement);
         }
 
+        if (EditTitle != null)
+        {
+            Element newElement = new();
+            newElement.Id = EditTitle.Id;
+            newElement.Content = EditTitle.Content;
+            newElement.SiteId = EditTitle.SiteId;
+            newElement.ElementType = ElementTypes.Title;
+            newElement.Position = EditTitle.Position;
+            DAL.ElementAPIManager.UpdateElement(newElement);
+        }
 
         if (EditText != null)
         {
             Element newElement = new();
-            newElement.Id = 13;
+            newElement.Id = EditText.Id;
             newElement.Content = EditText.Content;
-            newElement.SiteId = 1;
+            newElement.SiteId = EditText.SiteId;
             newElement.ElementType = ElementTypes.Text;
-            newElement.Position = 3;
+            newElement.Position = EditText.Position;
             DAL.ElementAPIManager.UpdateElement(newElement);
         }
+
 
 
         return RedirectToPage("./Index");

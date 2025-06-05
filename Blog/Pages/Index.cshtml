@@ -27,8 +27,9 @@
                     {
                         <a asp-route-moveIdUp="@i" class="btn btn-primary">↑</a>
                         <img class="card-img-top" src="~/userImages/@element.Content" />
+
                         <a asp-route-moveIdDown="@i" class="btn btn-primary">↓</a>
-                        <a asp-route-removeElement="@i" class="btn btn-danger">X</a>
+                        <a asp-route-removeElement="@element.Id" class="btn btn-danger">X</a>
                         <br />
                     }
                     @* <div class="card-body"> *@
@@ -40,13 +41,15 @@
                             <a asp-route-moveIdUp="@i" class="btn btn-primary float-start border">↑</a>
                             <a asp-route-moveIdDown="@i" class="btn btn-primary float-start border">↓</a>
                             <form method="post" enctype="multipart/form-data">
-                            <input asp-for="Title.Content" value="@element.Content" />
-                            @* <h5 class="card-title d-inline">@element.Content </h5> *@
-                            <a asp-route-removeElement="@i" class="btn btn-danger float-end border">X</a>
-                            @* <a asp-route-editElement="@i" class="btn btn-success float-end border">✓</a> *@
+                                <input asp-for="EditTitle.Content" value="@element.Content" />
+                                <input asp-for="EditTitle.Id" value="@element.Id" hidden="hidden" />
+                                <input asp-for="EditTitle.SiteId" value="@element.SiteId" hidden="hidden" />
+                                <input asp-for="EditTitle.Position" value="@element.Position" hidden="hidden" />
+
+                                <a asp-route-removeElement="@element.Id" class="btn btn-danger float-end border">X</a>
                                 <input type="submit" class="btn btn-success float-end border" value="✓" />
                             </form>
-                            
+
                             <br />
                         </div>
                     }
@@ -57,10 +60,31 @@
                             <a asp-route-moveIdUp="@i" class="btn btn-primary float-start border">↑</a>
                             <a asp-route-moveIdDown="@i" class="btn btn-primary float-start border">↓</a>
                             <form method="post" enctype="multipart/form-data">
-                            <textarea asp-for="EditText.Content" cols="28" rows="5" placeholder="@element.Content"></textarea>
-                            @* <p class="card-text linebreak d-inline">@element.Content </p> *@
-                            <a asp-route-removeElement="@i" class="btn btn-danger float-end border">X</a>
-                            @* <a asp-route-editElement="@i" class="btn btn-success float-end border">✓</a> *@
+                                <textarea asp-for="EditText.Content" cols="28" rows="5" placeholder="@element.Content"></textarea>
+                                <input asp-for="EditText.Id" value="@element.Id" hidden="hidden"/>
+                                <input asp-for="EditText.SiteId" value="@element.SiteId" hidden="hidden"/>
+                                <input asp-for="EditText.Position" value="@element.Position" hidden="hidden" />
+
+                                <a asp-route-removeElement="@element.Id" class="btn btn-danger float-end border">X</a>
+                                <input type="submit" class="btn btn-success float-end border" value="✓" />
+                            </form>
+                            <br />
+                        </div>
+                    }
+
+                    else if(element.ElementType == ElementTypes.Menu)
+                    {
+                        <div class="border border-4">
+                            @* <button>↑</button> *@
+                            <a asp-route-moveIdUp="@i" class="btn btn-primary float-start border">↑</a>
+                            <a asp-route-moveIdDown="@i" class="btn btn-primary float-start border">↓</a>
+                            <form method="post" enctype="multipart/form-data">
+                                <textarea asp-for="EditText.Content" cols="28" rows="5" placeholder="@element.Content"></textarea>
+                                <input asp-for="EditText.Id" value="@element.Id" hidden="hidden" />
+                                <input asp-for="EditText.SiteId" value="@element.SiteId" hidden="hidden" />
+                                <input asp-for="EditText.Position" value="@element.Position" hidden="hidden" />
+
+                                <a asp-route-removeElement="@element.Id" class="btn btn-danger float-end border">X</a>
                                 <input type="submit" class="btn btn-success float-end border" value="✓" />
                             </form>
                             <br />
@@ -97,12 +121,6 @@
                 </div>
 
                 <div><br /></div>
-                @* <a asp-route-addElement="1" class="btn btn-primary">Lägg till</a>
-
-                
-                
-                <select asp-for="@Model.SelectedValue" asp-items="Html.GetEnumSelectList<MyEnum>()"> 
-                <a asp-route-deleteId="@site.Id" class="btn btn-primary">Ta bort</a> *@
             </div>
         }
 
