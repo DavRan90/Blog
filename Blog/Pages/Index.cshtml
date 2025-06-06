@@ -61,8 +61,8 @@
                             <a asp-route-moveIdDown="@i" class="btn btn-primary float-start border">↓</a>
                             <form method="post" enctype="multipart/form-data">
                                 <textarea asp-for="EditText.Content" cols="28" rows="5" placeholder="@element.Content"></textarea>
-                                <input asp-for="EditText.Id" value="@element.Id" hidden="hidden"/>
-                                <input asp-for="EditText.SiteId" value="@element.SiteId" hidden="hidden"/>
+                                <input asp-for="EditText.Id" value="@element.Id" hidden="hidden" />
+                                <input asp-for="EditText.SiteId" value="@element.SiteId" hidden="hidden" />
                                 <input asp-for="EditText.Position" value="@element.Position" hidden="hidden" />
 
                                 <a asp-route-removeElement="@element.Id" class="btn btn-danger float-end border">X</a>
@@ -72,7 +72,7 @@
                         </div>
                     }
 
-                    else if(element.ElementType == ElementTypes.Menu)
+                    else if (element.ElementType == ElementTypes.Menu)
                     {
                         <div class="border border-4">
                             @* <button>↑</button> *@
@@ -102,20 +102,34 @@
                     @* <p class="card-footer">@site.Date</p> *@
                 }
                 <label asp-for="ElementTypes">Lägg till element</label>
-                @* @Html.DropDownList("AddElement", Html.GetEnumSelectList<ElementTypes>()) *@
                 <select asp-for="ElementTypes"
-                        onchange="selectElement()"
-                        id="selectedElement"
-                        class="form-control"
-                        asp-items="Html.GetEnumSelectList<ElementTypes>()">
+                onchange="selectElement()"
+                id="selectedElement"
+                class="form-control"
+                asp-items="Html.GetEnumSelectList<ElementTypes>()">
                 </select>
                 <div><br /></div>
                 <div id="content">
-                    <form method="post" enctype="multipart/form-data">
-                    <input asp-for="AddTitle.Content" class="show" id="title" />
-                    <textarea asp-for="AddText.Content" cols="28" rows="5" class="visually-hidden" id="text"></textarea>
-                    <input asp-for="AddUploadedImage" class="visually-hidden" id="image" />
-                    <br /><br />
+                    <form id="form" method="post" enctype="multipart/form-data">
+                        <input asp-for="AddTitle.Content" class="show" id="title" />
+                        <textarea asp-for="AddText.Content" cols="28" rows="5" class="visually-hidden" id="text"></textarea>
+                        <input asp-for="AddUploadedImage" class="visually-hidden" id="image" />
+                        
+                        @for(int i = 0; i < 4; i++)
+                        {
+                            <input asp-for="AddMenu.MenuTitles[@i]" class="visually-hidden" id="@i" />
+                        }
+                        
+                        @* <input asp-for="Menu.MenuTitles" class="visually-hidden" id="title2" />
+                        <input asp-for="Menu.MenuTitles" class="visually-hidden" id="title3" /> *@
+
+                        @* <select asp-for="Menu.NumberOfTitles"
+                                onchange="selectMenuItems()"
+                                id="menuBar"
+                                class="form-control visually-hidden"
+                                asp-items="Html.GetEnumSelectList<ElementTypes>()">
+                        </select> *@
+                        <br /><br />
                         <input type="submit" class="btn btn-primary" value="Lägg till element" />
                     </form>
                 </div>
@@ -144,7 +158,7 @@
         <label asp-for="Image.Content"></label>
         <br />
         <input asp-for="UploadedImage" />
-        
+
         <br /><br />
         <input type="submit" class="btn-success" value="Spara inlägget" />
     </form>

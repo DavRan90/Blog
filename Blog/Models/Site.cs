@@ -6,6 +6,8 @@ namespace Blog.Models
     {
         [JsonPropertyName("id")]
         public int Id { get; set; }
+        [JsonPropertyName("title")]
+        public string? Title { get; set; }
         [JsonPropertyName("elements")]
         public List<Element>? Elements { get; set; }
         [JsonPropertyName("userId")]

@@ -26,6 +26,8 @@ public class IndexModel : PageModel
     [BindProperty]
     public Models.Text Text { get; set; }
 
+    
+
     [BindProperty]
     public Models.Text EditText { get; set; }
 
@@ -50,6 +52,9 @@ public class IndexModel : PageModel
 
     [BindProperty]
     public Models.Text AddText { get; set; }
+
+    [BindProperty]
+    public Models.Menu AddMenu { get; set; }
 
     [BindProperty]
     public ElementTypes ElementTypes { get; set; }
@@ -196,6 +201,19 @@ public class IndexModel : PageModel
             newElement.ElementType = ElementTypes.Text;
             newElement.Position = _context.Elements.Count() + 1;
             await DAL.ElementAPIManager.AddElement(newElement);
+        }
+
+        if (AddMenu.MenuTitles[0] != null)
+        {
+            Menu newMenu = new();
+            for (int i = 0; i < 3; i++)
+            {
+                newMenu.MenuTitles[i] = AddMenu.MenuTitles[i];
+                newMenu.Position = _context.Elements.Count() + 1;
+                newMenu.ElementType = ElementTypes.Menu ;
+                newMenu.SiteId = 1;
+            }            
+            await DAL.ElementAPIManager.AddElement(newMenu);
         }
 
         if (EditTitle != null)
