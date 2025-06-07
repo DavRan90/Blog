@@ -52,25 +52,25 @@ function selectElement() {
         image.className = "show";
     }
     else if (element == 4) {
-        let title1 = document.getElementById("1");
+        let title1 = document.getElementById("0");
         title1.className = "show";
-        let title2 = document.getElementById("2");
+        let title2 = document.getElementById("1");
         title2.className = "show";
-        let title3 = document.getElementById("3");
+        let title3 = document.getElementById("2");
         title3.className = "show";
     }
     function hideAll() {
         let title = document.getElementById("title");
         let text = document.getElementById("text");
         let image = document.getElementById("image");
-        let title1 = document.getElementById("1");
-        let title2 = document.getElementById("2");
-        let title3 = document.getElementById("3");
+        let title1 = document.getElementById("0");
+        let title2 = document.getElementById("1");
+        let title3 = document.getElementById("2");
         title.className = "visually-hidden"
         text.className = "visually-hidden"
         image.className = "visually-hidden"
         title1.className = "visually-hidden"
-        title2.className = "visually-hidden"
-        title3.className = "visually-hidden"
+        //title2.className = "visually-hidden"
+        //title3.className = "visually-hidden"
     }
 }

@@ -2,6 +2,7 @@ using Blog.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 
 namespace Blog.Pages;
@@ -32,10 +33,13 @@ public class IndexModel : PageModel
     public Models.Text EditText { get; set; }
 
     [BindProperty]
-    public Models.Text EditTitle { get; set; }
+    public Models.Title EditTitle { get; set; }
 
     [BindProperty]
-    public Models.Text EditImage { get; set; }
+    public Models.Image EditImage { get; set; }
+
+    [BindProperty]
+    public Models.Menu EditMenu { get; set; }
 
     [BindProperty]
     public Models.Image Image { get; set; }
@@ -64,7 +68,7 @@ public class IndexModel : PageModel
     public List<Models.Element> Elements { get; set; }
 
 
-    public async Task OnGetAsync(int deleteId, int moveIdUp, int moveIdDown, int removeElement, int editElement)
+    public async Task OnGetAsync(int deleteId, int moveIdUp, int moveIdDown, int moveIdLeft, int moveIdRight, int removeElement, int editElement)
     {
         Sites = await DAL.SiteAPIManager.GetAllSites();
         Elements = await DAL.ElementAPIManager.GetAllElements();
@@ -92,27 +96,47 @@ public class IndexModel : PageModel
             await _context.SaveChangesAsync();
         }
 
+        
+
+        if (moveIdDown > 0 && moveIdDown < _context.Elements.Count())
+        {
+            Models.Element elementToBeMoved = await _context.Elements.Where(e => e.Position == moveIdDown).SingleOrDefaultAsync();
+            Models.Element elementAtNewPosition = await _context.Elements.Where(e => e.Position == moveIdDown + 1).SingleOrDefaultAsync();
+            elementToBeMoved.Position += 1;
+            elementAtNewPosition.Position -= 1;
+            await _context.SaveChangesAsync();
+        }
+
+        if (moveIdUp >= 1 && moveIdUp <= _context.Elements.Count())
+        {
+            Models.Element elementToBeMoved = await _context.Elements.Where(e => e.Position == moveIdUp).SingleOrDefaultAsync();
+            Models.Element elementAtNewPosition = await _context.Elements.Where(e => e.Position == moveIdUp - 1).SingleOrDefaultAsync();
+            elementToBeMoved.Position -= 1;
+            elementAtNewPosition.Position += 1;
+            await _context.SaveChangesAsync();
+        }
+
+        if (moveIdLeft > 0)
+        {
+            var menu = await _context.Elements.Where(e => e.ElementType == ElementTypes.Menu).SingleOrDefaultAsync();
+            var menuItemToMove = menu.MenuTitles[moveIdLeft];
+            menu.MenuTitles.RemoveAt(moveIdLeft);
+            menu.MenuTitles.Insert(moveIdLeft-1, menuItemToMove);
+            await _context.SaveChangesAsync();
+        }
+
+        if (moveIdRight > 0)
+        {
+            moveIdRight--; // eftersom jag inte vill skicka in ett 0-värde
+            var menu = await _context.Elements.Where(e => e.ElementType == ElementTypes.Menu).SingleOrDefaultAsync();
+            var menuItemToMove = menu.MenuTitles[moveIdRight];
+            menu.MenuTitles.RemoveAt(moveIdRight);
+            menu.MenuTitles.Insert(moveIdRight + 1, menuItemToMove);
+            await _context.SaveChangesAsync();
+        }
+
         Sites = await DAL.SiteAPIManager.GetAllSites();
         Elements = await DAL.ElementAPIManager.GetAllElements();
-
-        //if (moveIdDown > 0 && moveIdDown < _context.Elements.Count())
-        //{
-        //    Models.Element elementToBeMoved = await _context.Elements.Where(e => e.Position == moveIdDown).SingleOrDefaultAsync();
-        //    Models.Element elementAtNewPosition = await _context.Elements.Where(e => e.Position == moveIdDown + 1).SingleOrDefaultAsync();
-        //    elementToBeMoved.Position += 1;
-        //    elementAtNewPosition.Position -= 1;
-        //    await _context.SaveChangesAsync();
-        //}
-
-        //if (moveIdUp >= 1 && moveIdUp <= _context.Elements.Count())
-        //{
-        //    Models.Element elementToBeMoved = await _context.Elements.Where(e => e.Position == moveIdUp).SingleOrDefaultAsync();
-        //    Models.Element elementAtNewPosition = await _context.Elements.Where(e => e.Position == moveIdUp - 1).SingleOrDefaultAsync();
-        //    elementToBeMoved.Position -= 1;
-        //    elementAtNewPosition.Position += 1;
-        //    await _context.SaveChangesAsync();
-        //}
-
         //if (deleteId != 0)
         //{
         //    Models.Site siteToBeDeleted = await _context.Sites.FindAsync(deleteId);
@@ -203,16 +227,19 @@ public class IndexModel : PageModel
             await DAL.ElementAPIManager.AddElement(newElement);
         }
 
-        if (AddMenu.MenuTitles[0] != null)
+        if (!AddMenu.MenuTitles.IsNullOrEmpty())
         {
-            Menu newMenu = new();
+            Element newMenu = new();
+
             for (int i = 0; i < 3; i++)
             {
-                newMenu.MenuTitles[i] = AddMenu.MenuTitles[i];
-                newMenu.Position = _context.Elements.Count() + 1;
-                newMenu.ElementType = ElementTypes.Menu ;
-                newMenu.SiteId = 1;
-            }            
+                newMenu.MenuTitles.Add(AddMenu.MenuTitles[i]);
+            }
+
+            newMenu.Position = _context.Elements.Count() + 1;
+            newMenu.ElementType = ElementTypes.Menu;
+            newMenu.SiteId = 1;
+
             await DAL.ElementAPIManager.AddElement(newMenu);
         }
 
@@ -235,6 +262,21 @@ public class IndexModel : PageModel
             newElement.SiteId = EditText.SiteId;
             newElement.ElementType = ElementTypes.Text;
             newElement.Position = EditText.Position;
+            DAL.ElementAPIManager.UpdateElement(newElement);
+        }
+
+        if (!EditMenu.MenuTitles.IsNullOrEmpty())
+        {
+            Element newElement = new();
+            newElement.Id = EditMenu.Id;
+
+            for (int i = 0; i < 3; i++)
+            {
+                newElement.MenuTitles.Add(EditMenu.MenuTitles[i]);
+            }
+            newElement.SiteId = EditMenu.SiteId;
+            newElement.ElementType = ElementTypes.Menu;
+            newElement.Position = EditMenu.Position;
             DAL.ElementAPIManager.UpdateElement(newElement);
         }
 
