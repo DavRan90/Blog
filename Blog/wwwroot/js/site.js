@@ -4,6 +4,48 @@
 // Write your JavaScript code.
 
 document.getElementById("newElement").onchange = function () { myFunction() };
+
+function changeBackgroundColor() {
+    let colorpicker = document.getElementById('colorpickerbg');    
+
+    setInterval(() => {
+        let color = colorpicker.value;
+        document.getElementById("card").style.backgroundColor = color;
+        
+    }, 200);
+}
+
+function changeFontColor() {
+    let colorpickerfont = document.getElementById('colorpickerfont');
+    
+    setInterval(() => {
+        let color = colorpickerfont.value;
+        document.getElementById("card").style.color = color;
+
+    }, 200);
+}
+
+function preview() {
+    let x = document.getElementById("previewBtn");
+    let element = document.getElementById('preview');
+    let previewElements = document.getElementsByClassName('preview');
+    if (x.value == "Preview") {
+        x.value = "Edit";
+        for (var i = 0; i < previewElements.length; i++)
+        {
+            previewElements[i].className += " visually-hidden";
+        }
+    }
+    else {
+        x.value = "Preview";
+        for (var i = 0; i < previewElements.length; i++) {
+            previewElements[i].className += "show";
+        }
+        /*x.className¨= "btn btn-info float-end"*/
+    }
+    
+}
+
 function myFunction() {
     let element = document.getElementById("selectedElement").value;
     var x = document.getElementById("content");
