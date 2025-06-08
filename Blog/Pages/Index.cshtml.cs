@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 
 namespace Blog.Pages;
@@ -59,6 +60,9 @@ public class IndexModel : PageModel
 
     [BindProperty]
     public Models.Menu AddMenu { get; set; }
+
+    [BindProperty]
+    public Models.Image AddImage { get; set; }
 
     [BindProperty]
     public ElementTypes ElementTypes { get; set; }
@@ -171,7 +175,8 @@ public class IndexModel : PageModel
         //Site.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         //_context.Pages.Add(Site);
         //await _context.SaveChangesAsync();
-        Site.Id = 21;
+
+        //Site.Id = 21;
         string fileName = "";
         if (UploadedImage != null)
         {
@@ -227,20 +232,54 @@ public class IndexModel : PageModel
             await DAL.ElementAPIManager.AddElement(newElement);
         }
 
+        string fileAddName = "";
+        if (AddUploadedImage != null)
+        {
+            fileAddName = Random.Shared.Next(0, 100000).ToString() + "_" + AddUploadedImage.FileName;
+            using (var fileStream = new FileStream("./wwwroot/userImages/" + fileAddName, FileMode.Create))
+            {
+                await AddUploadedImage.CopyToAsync(fileStream);
+            }
+            Element newElement = new();
+            newElement.Content = fileAddName;
+            newElement.SiteId = 1;
+            newElement.ElementType = ElementTypes.Image;
+            newElement.Position = _context.Elements.Count() + 1;
+
+            await DAL.ElementAPIManager.AddElement(newElement);
+            //_context.Elements.Add(Image);
+            //await _context.SaveChangesAsync();
+            //"./wwwroot/userImages/
+        }
+
+        if (AddImage.Content != null)
+        {
+            Element newElement = new();
+            newElement.Content = AddImage.Content;
+            newElement.SiteId = 1;
+            newElement.ElementType = ElementTypes.Image;
+            newElement.Position = _context.Elements.Count() + 1;
+            await DAL.ElementAPIManager.AddElement(newElement);
+        }
+
         if (!AddMenu.MenuTitles.IsNullOrEmpty())
         {
-            Element newMenu = new();
-
-            for (int i = 0; i < 3; i++)
+            if (!AddMenu.MenuTitles[0].IsNullOrEmpty())
             {
-                newMenu.MenuTitles.Add(AddMenu.MenuTitles[i]);
+                Element newMenu = new();
+
+                for (int i = 0; i < 3; i++)
+                {
+                    newMenu.MenuTitles.Add(AddMenu.MenuTitles[i]);
+                }
+
+                newMenu.Position = _context.Elements.Count() + 1;
+                newMenu.ElementType = ElementTypes.Menu;
+                newMenu.SiteId = 1;
+
+                await DAL.ElementAPIManager.AddElement(newMenu);
             }
-
-            newMenu.Position = _context.Elements.Count() + 1;
-            newMenu.ElementType = ElementTypes.Menu;
-            newMenu.SiteId = 1;
-
-            await DAL.ElementAPIManager.AddElement(newMenu);
+            
         }
 
         if (EditTitle != null)
@@ -251,7 +290,7 @@ public class IndexModel : PageModel
             newElement.SiteId = EditTitle.SiteId;
             newElement.ElementType = ElementTypes.Title;
             newElement.Position = EditTitle.Position;
-            DAL.ElementAPIManager.UpdateElement(newElement);
+            await DAL.ElementAPIManager.UpdateElement(newElement);
         }
 
         if (EditText != null)
@@ -262,7 +301,7 @@ public class IndexModel : PageModel
             newElement.SiteId = EditText.SiteId;
             newElement.ElementType = ElementTypes.Text;
             newElement.Position = EditText.Position;
-            DAL.ElementAPIManager.UpdateElement(newElement);
+            await DAL.ElementAPIManager.UpdateElement(newElement);
         }
 
         if (!EditMenu.MenuTitles.IsNullOrEmpty())
@@ -277,10 +316,15 @@ public class IndexModel : PageModel
             newElement.SiteId = EditMenu.SiteId;
             newElement.ElementType = ElementTypes.Menu;
             newElement.Position = EditMenu.Position;
-            DAL.ElementAPIManager.UpdateElement(newElement);
+            await DAL.ElementAPIManager.UpdateElement(newElement);
         }
 
-
+        if(!Site.BackgroundColorString.IsNullOrEmpty())
+        {
+            var siteToBeEdited = await _context.Sites.Where(s => s.Id == Site.Id).SingleOrDefaultAsync();
+            siteToBeEdited.BackgroundColorString = Site.BackgroundColorString;
+            await DAL.SiteAPIManager.UpdateSite(siteToBeEdited);
+        }
 
         return RedirectToPage("./Index");
     }

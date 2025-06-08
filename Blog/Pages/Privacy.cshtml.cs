@@ -5,15 +5,14 @@ namespace Blog.Pages;
 
 public class PrivacyModel : PageModel
 {
-    private readonly ILogger<PrivacyModel> _logger;
+    public List<Models.Site> Sites { get; set; }
 
-    public PrivacyModel(ILogger<PrivacyModel> logger)
-    {
-        _logger = logger;
-    }
+    public List<Models.Element> Elements { get; set; }
 
-    public void OnGet()
+    public async Task OnGetAsync()
     {
+        Sites = await DAL.SiteAPIManager.GetAllSites();
+        Elements = await DAL.ElementAPIManager.GetAllElements();
     }
 }
 

@@ -5,22 +5,27 @@
 
 document.getElementById("newElement").onchange = function () { myFunction() };
 
+function loadBackgroundColor() {
+    var x = document.getElementById("myText");
+    x.style.color = "Red";
+}
+
 function changeBackgroundColor() {
-    let colorpicker = document.getElementById('colorpickerbg');    
+    let colorpicker = document.getElementById('colorpickerbg');
 
     setInterval(() => {
         let color = colorpicker.value;
-        document.getElementById("card").style.backgroundColor = color;
-        
+        document.getElementById("page").style.backgroundColor = color;
+
     }, 200);
 }
 
 function changeFontColor() {
     let colorpickerfont = document.getElementById('colorpickerfont');
-    
+
     setInterval(() => {
         let color = colorpickerfont.value;
-        document.getElementById("card").style.color = color;
+        document.getElementById("page").style.color = color;
 
     }, 200);
 }
@@ -31,8 +36,7 @@ function preview() {
     let previewElements = document.getElementsByClassName('preview');
     if (x.value == "Preview") {
         x.value = "Edit";
-        for (var i = 0; i < previewElements.length; i++)
-        {
+        for (var i = 0; i < previewElements.length; i++) {
             previewElements[i].className += " visually-hidden";
         }
     }
@@ -43,7 +47,7 @@ function preview() {
         }
         /*x.className¨= "btn btn-info float-end"*/
     }
-    
+
 }
 
 function myFunction() {
@@ -66,7 +70,7 @@ function myFunction() {
     }
     let test = "<a asp-route-addElement='" + element + "' class='btn btn-primary'> Lägg till</a >";
     x.innerHTML += test
-    
+
 }
 //function selectMenuItems() {
 //    let form = document.getElementById("form");

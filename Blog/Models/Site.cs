@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Drawing;
+using System.Text.Json.Serialization;
 
 namespace Blog.Models
 {
@@ -6,6 +7,10 @@ namespace Blog.Models
     {
         [JsonPropertyName("id")]
         public int Id { get; set; }
+        [JsonPropertyName("backgroundColorString")]
+        public string? BackgroundColorString { get; set; }
+        //public ConsoleColor BackgroundColor { get; set; }
+
         [JsonPropertyName("title")]
         public string? Title { get; set; }
         [JsonPropertyName("elements")]

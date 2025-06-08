@@ -25,6 +25,10 @@ body {
     width: 68rem;
 }
 
+.pagesize {
+    width: 65rem;
+}
+
 .linebreak{
     white-space: pre-wrap;
 }
@@ -32,4 +36,8 @@ body {
 .hide
 {
     display: none;
+}
+
+.myBG {
+    background-color = #ff8000;
 }
