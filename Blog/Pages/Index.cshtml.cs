@@ -334,6 +334,13 @@ public class IndexModel : PageModel
             await DAL.SiteAPIManager.UpdateSite(siteToBeEdited);
         }
 
+        if (!Site.FontColorString.IsNullOrEmpty())
+        {
+            var siteToBeEdited = await _context.Sites.Where(s => s.Id == Site.Id).SingleOrDefaultAsync();
+            siteToBeEdited.FontColorString = Site.FontColorString;
+            await DAL.SiteAPIManager.UpdateSite(siteToBeEdited);
+        }
+
         return RedirectToPage("./Index");
     }
 }

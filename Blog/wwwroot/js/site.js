@@ -82,84 +82,79 @@ function myFunction() {
 //}
 
 function selectElement(siteId) {
-    let element = document.getElementById("selectedElement1").value;
+    /*let element = document.getElementById("selectedElement1").value;*/
+
+    // Think this is the one
     let element2 = document.querySelector("select[name='selectedElement" + CSS.escape(siteId) + "']").value;
-    var x = document.getElementById("content");
 
-    
-
-//let title = document.getElementById("title");
-//let text = document.getElementById("title");
-//let image = document.getElementById("title");
-
-//let elements = document.getElementsByClassName(siteId);
-
-//for (let i = 0; i < elements.length; i++) {
-//    if (elements[i].id == "title") {
-//        title = elements[i];
-//    }
-//    else if (elements[i].id == "text") {
-//        text = elements[i];
-//    }
-//    else if (elements[i].id == "image") {
-//        title = elements[i];
-//    }
-//}
-
-//hideAll();
+    /*var x = document.getElementById("content");*/
 
 
-//if (element == 1) {
-//    title.className = "show";
-//}
-//else if (element == 2) {
-//    text.className = "show";
-//}
-//else if (element == 3) {
-//    image.className = "show";
+
+    //let title = document.getElementById("title");
+    //let text = document.getElementById("title");
+    //let image = document.getElementById("title");
+
+    //let elements = document.getElementsByClassName(siteId);
+
+    //for (let i = 0; i < elements.length; i++) {
+    //    if (elements[i].id == "title") {
+    //        title = elements[i];
+    //    }
+    //    else if (elements[i].id == "text") {
+    //        text = elements[i];
+    //    }
+    //    else if (elements[i].id == "image") {
+    //        title = elements[i];
+    //    }
     //}
 
-    let title = document.querySelector("input[name='title" + CSS.escape(siteId) + "']");
-    let text = document.querySelector("textarea[name='text" + CSS.escape(siteId) + "']");
-    let image = document.querySelector("input[name='image" + CSS.escape(siteId) + "']");
-hideAll();
+    //hideAll();
+
+
+    //if (element == 1) {
+    //    title.className = "show";
+    //}
+    //else if (element == 2) {
+    //    text.className = "show";
+    //}
+    //else if (element == 3) {
+    //    image.className = "show";
+    //}
+
+    let title = document.querySelector("#title" + CSS.escape(siteId));
+    let text = document.querySelector("#text" + CSS.escape(siteId));
+    let image = document.querySelector("#image" + CSS.escape(siteId));
+
+    let menuTitle1 = document.querySelector("#menu" + CSS.escape(siteId) + "0");
+    let menuTitle2 = document.querySelector("#menu" + CSS.escape(siteId) + "1");
+    let menuTitle3 = document.querySelector("#menu" + CSS.escape(siteId) + "2");
+
+    /*let title = document.querySelector("input[name='title" + CSS.escape(siteId) + "']");*/
+    //let text = document.querySelector("textarea[name='text" + CSS.escape(siteId) + "']");
+    //let image = document.querySelector("input[name='image" + CSS.escape(siteId) + "']");
+    hideAll();
 
     if (element2 == 1) {
-        /*let title = document.getElementsByClassName(siteId).getElementById("title");*/
-        
-        /*const title = document.querySelector("div." + CSS.escape(siteId) + "input[name='title']");*/
         title.className = "show";
-}
+    }
     else if (element2 == 2) {
-        
-    /*let text = document.getElementById("text");*/
-    text.className = "show";
-}
+        text.className = "show";
+    }
     else if (element2 == 3) {
-        
-    /*let image = document.getElementById("image");*/
-    image.className = "show";
-}
-else if (element == 4) {
-    let title1 = document.getElementById("0");
-    title1.className = "show";
-    let title2 = document.getElementById("1");
-    title2.className = "show";
-    let title3 = document.getElementById("2");
-    title3.className = "show";
-}
-function hideAll() {
-    /*let title = document.getElementById("title");*/
-    //let text = document.getElementById("text");
-    //let image = document.getElementById("image");
-    let title1 = document.getElementById("0");
-    let title2 = document.getElementById("1");
-    let title3 = document.getElementById("2");
-    title.className = "visually-hidden"
-    text.className = "visually-hidden"
-    image.className = "visually-hidden"
-    title1.className = "visually-hidden"
-    title2.className = "visually-hidden"
-    title3.className = "visually-hidden"
-}
+        image.className = "show";
+    }
+    else if (element2 == 4) {
+        menuTitle1.className = "show";
+        menuTitle2.className = "show";
+        menuTitle3.className = "show";
+    }
+    function hideAll() {
+        title.className = "visually-hidden"
+        text.className = "visually-hidden"
+        image.className = "visually-hidden"
+        menuTitle1.className = "visually-hidden"
+        menuTitle2.className = "visually-hidden"
+        menuTitle3.className = "visually-hidden"
+    }
 }

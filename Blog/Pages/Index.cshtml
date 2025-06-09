@@ -12,6 +12,7 @@
     string image = "image";
     string menu = "menu";
     string selectedElement = "selectedElement";
+    string menuOption = "";
 }
 
 <div class="text-center">
@@ -33,10 +34,11 @@
                 <h2 class="">SiteId: @site.Id</h2>
                 <h2>Sitename: @site.Title</h2>
                 <h2>Sitecolor: @site.BackgroundColorString</h2>
+                <h2>Fontcolor: @site.FontColorString</h2>
                 <input type="button" class="btn btn-info float-end" id="previewBtn" onclick="preview()" value="Preview" />
                 <div><br /><br /></div>
 
-                <div class="card m-2" id="page" style="background:@site.BackgroundColorString">
+                <div class="card m-2" id="page" style="background:@site.BackgroundColorString; color:@site.FontColorString; font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">
                     @* @foreach (var element in Model.Elements) *@
                     @for (int i = 1; i <= Model.Elements.Count(); i++)
                     {
@@ -114,7 +116,7 @@
                                                     @* <a class="navbar-brand" asp-area="" asp-page="/Index">Blog</a> *@
                                                     @* In case of smaller windows *@
                                                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                                                            aria-expanded="false" aria-label="Toggle navigation">
+                                                    aria-expanded="false" aria-label="Toggle navigation">
                                                         <span class="navbar-toggler-icon"></span>
                                                     </button>
                                                     <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
@@ -168,7 +170,7 @@
                                 </div>
                             }
                         }
-                        
+
 
                         <br />
 
@@ -182,23 +184,23 @@
                     }
 
                 </div>
-                
+
                 <div><br /><br /></div>
                 <h5>Choose a background color</h5>
-                <input id="colorpickerbg" type="color" value="#ffffff" onchange="changeBackgroundColor()">
+                @* <input id="colorpickerbg" type="color" value="#ffffff" onchange="changeBackgroundColor()"> *@
                 <form method="post" enctype="multipart/form-data">
-                    <input asp-for="Site.BackgroundColorString" value="@site.BackgroundColorString" type="color" id="color" />
+                    <input asp-for="Site.BackgroundColorString" value="@site.BackgroundColorString" type="color" id="colorpickerbg" onchange="changeBackgroundColor()" />
                     <input asp-for="Site.Id" value="@site.Id" hidden="hidden" />
                     <br /><br />
                     <button onclick="" class="btn btn-info w-25"> Save Background Color </button>
                 </form>
-                
+
                 <div><br /></div>
 
                 <h5>Choose a font color</h5>
-                <input id="colorpickerfont" type="color" value="#ffffff" onchange="changeFontColor()">
+                @* <input id="colorpickerfont" type="color" value="#ffffff" onchange="changeFontColor()"> *@
                 <form method="post" enctype="multipart/form-data">
-                    <input asp-for="Site.BackgroundColorString" type="color" id="color" value="#ffffff" />
+                    <input asp-for="Site.FontColorString" type="color" id="colorpickerfont" value="@site.FontColorString" onchange="changeFontColor()" />
                     <input asp-for="Site.Id" value="@site.Id" hidden="hidden" />
                     <br /><br />
                     <button onclick="" class="btn btn-info w-25"> Save Font Color </button>
@@ -210,7 +212,7 @@
                 @* Should be a select dropdown *@
                 <input id="fontpicker" type="color" value="#ffffff" onchange="changeFontColor()">
                 <form method="post" enctype="multipart/form-data">
-                    <input asp-for="Site.BackgroundColorString" type="color" id="color" value="#ffffff" />
+                    <select asp-for="Site.FontFamilyString" type="color" id="color" value="@site.FontFamilyString" />
                     <input asp-for="Site.Id" value="@site.Id" hidden="hidden" />
                     <br /><br />
                     <button onclick="" class="btn btn-info w-25"> Save Font Style </button>
@@ -221,29 +223,28 @@
                 <div>
                     <label asp-for="ElementTypes">Lägg till element</label>
                     <select asp-for="ElementTypes"
-                            onchange="selectElement(@site.Id)"
-                            id="@selectedElement"
-                            name="@selectedElement"
-                            class="form-control"
-                            asp-items="Html.GetEnumSelectList<ElementTypes>()">
+                    onchange="selectElement(@site.Id)"
+                    id="@selectedElement"
+                    name="@selectedElement"
+                    class="form-control"
+                    asp-items="Html.GetEnumSelectList<ElementTypes>()">
                     </select>
                 </div>
-                
+
                 <div><br /></div>
                 <div id="content" class="">
                     <form id="form" method="post" enctype="multipart/form-data">
-                            <input asp-for="AddTitle.Content" class="show" id="title" name="@titel" />
-                        <textarea asp-for="AddText.Content" cols="28" rows="5" class="visually-hidden @site.Id" id="text" name="@text"></textarea>
-                        <input asp-for="AddUploadedImage" class="visually-hidden @site.Id" id="image" name="@image" />
+                        <input asp-for="AddTitle.Content" class="show" id="@titel" />
+                        <textarea asp-for="AddText.Content" cols="28" rows="5" class="visually-hidden" id="@text"></textarea>
+                        <input asp-for="AddUploadedImage" class="visually-hidden" id="@image"/>
                         <input asp-for="Site.Id" value="@site.Id" hidden="hidden" />
-                        @* <input asp-for="AddMenu.MenuTitles" class="visually-hidden" id="0" /> *@
+
                         @for(int i = 0; i < 4; i++)
                         {
-                            <input asp-for="AddMenu.MenuTitles[@i]" class="visually-hidden @site.Id" id="@i" />
+                            menuOption = (menu + i);
+                            <input asp-for="AddMenu.MenuTitles[@i]" class="visually-hidden" id="@menuOption" />
+                            @* <input asp-for="AddMenu.MenuTitles[@i]" class="visually-hidden" id="@i" /> *@
                         }
-                        
-                        @* <input asp-for="Menu.MenuTitles" class="visually-hidden" id="title2" />
-                        <input asp-for="Menu.MenuTitles" class="visually-hidden" id="title3" /> *@
 
                         @* <select asp-for="Menu.NumberOfTitles"
                                 onchange="selectMenuItems()"
