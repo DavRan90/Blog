@@ -7,6 +7,11 @@
     var user = await UserManager.GetUserAsync(User);
     var bgColor = "#ff8000";
     int menuItems = 3;
+    string titel = "title";
+    string text = "text";
+    string image = "image";
+    string menu = "menu";
+    string selectedElement = "selectedElement";
 }
 
 <div class="text-center">
@@ -19,10 +24,15 @@
     {
         foreach (var site in Model.Sites)
         {
+            titel = $"title{site.Id}";
+            text = $"text{site.Id}";
+            image = $"image{site.Id}";
+            menu = $"menu{site.Id}";
+            selectedElement = $"selectedElement{site.Id}";
             <div class="card m-2 cardsize" id="site">
-                <h2 class="">SiteId: @Model.Sites[0].Id</h2>
-                <h2>Sitename: @Model.Sites[0].Title</h2>
-                <h2>Sitecolor: @Model.Sites[0].BackgroundColorString</h2>
+                <h2 class="">SiteId: @site.Id</h2>
+                <h2>Sitename: @site.Title</h2>
+                <h2>Sitecolor: @site.BackgroundColorString</h2>
                 <input type="button" class="btn btn-info float-end" id="previewBtn" onclick="preview()" value="Preview" />
                 <div><br /><br /></div>
 
@@ -30,131 +40,135 @@
                     @* @foreach (var element in Model.Elements) *@
                     @for (int i = 1; i <= Model.Elements.Count(); i++)
                     {
-                        var element = Model.Elements.Where(e => e.Position == i).SingleOrDefault();
-                        if (element.ElementType == ElementTypes.Image)
+                        var element = Model.Elements.Where(e => e.Position == i && e.SiteId == site.Id).SingleOrDefault();
+                        if(element != null)
                         {
-                            <a asp-route-moveIdUp="@i" class="btn btn-primary">↑</a>
-                            <img class="card-img-top" src="~/userImages/@element.Content" />
+                            if (element.ElementType == ElementTypes.Image)
+                            {
+                                <a asp-route-moveIdUp="@i" class="btn btn-primary">↑</a>
+                                <img class="card-img-top" src="~/userImages/@element.Content" />
 
-                            <a asp-route-moveIdDown="@i" class="btn btn-primary">↓</a>
-                            <a asp-route-removeElement="@element.Id" class="btn btn-danger">X</a>
-                            <br />
-                        }
-                        @* <div class="card-body"> *@
+                                <a asp-route-moveIdDown="@i" class="btn btn-primary">↓</a>
+                                <a asp-route-removeElement="@element.Id" class="btn btn-danger">X</a>
+                                <br />
+                            }
+                            @* <div class="card-body"> *@
 
-                        else if (element.ElementType == ElementTypes.Title)
-                        {
+                            else if (element.ElementType == ElementTypes.Title)
+                            {
 
-                            <div class="border border-4">
-                                <div class="container p-3 border">
-                                    <a asp-route-moveIdUp="@i" class="btn btn-primary border preview">↑</a>
-                                    <a asp-route-moveIdDown="@i" class="btn btn-primary border preview">↓</a>
-                                    <br class="preview" /><br class="preview" />
+                                <div class="border border-4">
+                                    <div class="container p-3 border">
+                                        <a asp-route-moveIdUp="@i" class="btn btn-primary border preview">↑</a>
+                                        <a asp-route-moveIdDown="@i" class="btn btn-primary border preview">↓</a>
+                                        <br class="preview" /><br class="preview" />
 
-                                    <h2>@element.Content</h2>
-                                    <form method="post" enctype="multipart/form-data">
-                                        <input asp-for="EditTitle.Content" value="@element.Content" class="preview" />
-                                        <input asp-for="EditTitle.Id" value="@element.Id" hidden="hidden" />
-                                        <input asp-for="EditTitle.SiteId" value="@element.SiteId" hidden="hidden" />
-                                        <input asp-for="EditTitle.Position" value="@element.Position" hidden="hidden" />
-                                        <a asp-route-removeElement="@element.Id" class="btn btn-danger float-end border preview">X</a>
-                                        <input type="submit" class="btn btn-success float-end border preview" value="✓" />
-                                    </form>
+                                        <h2>@element.Content</h2>
+                                        <form method="post" enctype="multipart/form-data">
+                                            <input asp-for="EditTitle.Content" value="@element.Content" class="preview" />
+                                            <input asp-for="EditTitle.Id" value="@element.Id" hidden="hidden" />
+                                            <input asp-for="EditTitle.SiteId" value="@element.SiteId" hidden="hidden" />
+                                            <input asp-for="EditTitle.Position" value="@element.Position" hidden="hidden" />
+                                            <a asp-route-removeElement="@element.Id" class="btn btn-danger float-end border preview">X</a>
+                                            <input type="submit" class="btn btn-success float-end border preview" value="✓" />
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
-                        }
-                        else if (element.ElementType == ElementTypes.Text)
-                        {
-                            <div class="border border-4">
-                                <div class="container p-3 border">
-                                    <a asp-route-moveIdUp="@i" class="btn btn-primary border preview">↑</a>
-                                    <a asp-route-moveIdDown="@i" class="btn btn-primary border preview">↓</a>
-                                    <br class="preview" /><br class="preview" />
+                            }
+                            else if (element.ElementType == ElementTypes.Text)
+                            {
+                                <div class="border border-4">
+                                    <div class="container p-3 border">
+                                        <a asp-route-moveIdUp="@i" class="btn btn-primary border preview">↑</a>
+                                        <a asp-route-moveIdDown="@i" class="btn btn-primary border preview">↓</a>
+                                        <br class="preview" /><br class="preview" />
 
-                                    @* If previewing *@
-                                    <p class="linebreak border border-2 p-3 rounded-1">@element.Content</p>
+                                        @* If previewing *@
+                                        <p class="linebreak border border-2 p-3 rounded-1">@element.Content</p>
 
-                                    <form method="post" enctype="multipart/form-data" class="preview">
-                                        <textarea asp-for="EditText.Content" cols="28" rows="5" placeholder="@element.Content"></textarea>
-                                        <input asp-for="EditText.Id" value="@element.Id" hidden="hidden" />
-                                        <input asp-for="EditText.SiteId" value="@element.SiteId" hidden="hidden" />
-                                        <input asp-for="EditText.Position" value="@element.Position" hidden="hidden" />
+                                        <form method="post" enctype="multipart/form-data" class="preview">
+                                            <textarea asp-for="EditText.Content" cols="28" rows="5" placeholder="@element.Content"></textarea>
+                                            <input asp-for="EditText.Id" value="@element.Id" hidden="hidden" />
+                                            <input asp-for="EditText.SiteId" value="@element.SiteId" hidden="hidden" />
+                                            <input asp-for="EditText.Position" value="@element.Position" hidden="hidden" />
 
-                                        <a asp-route-removeElement="@element.Id" class="btn btn-danger float-end border">X</a>
-                                        <input type="submit" class="btn btn-success float-end border" value="✓" />
-                                    </form>
+                                            <a asp-route-removeElement="@element.Id" class="btn btn-danger float-end border">X</a>
+                                            <input type="submit" class="btn btn-success float-end border" value="✓" />
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
-                        }
+                            }
 
-                        else if (element.ElementType == ElementTypes.Menu)
-                        {
-                            <div class="border border-4">
-                                <div class="container p-3 border">
-                                    <a asp-route-moveIdUp="@i" class="btn btn-primary border preview">↑</a>
-                                    <a asp-route-moveIdDown="@i" class="btn btn-primary border preview">↓</a>
-                                    <br class="preview" /><br class="preview" />
+                            else if (element.ElementType == ElementTypes.Menu)
+                            {
+                                <div class="border border-4">
+                                    <div class="container p-3 border">
+                                        <a asp-route-moveIdUp="@i" class="btn btn-primary border preview">↑</a>
+                                        <a asp-route-moveIdDown="@i" class="btn btn-primary border preview">↓</a>
+                                        <br class="preview" /><br class="preview" />
 
-                                    @* If previewing *@
-                                    <header>
-                                        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light box-shadow mb-3">
-                                            <div class="container">
-                                                @* <a class="navbar-brand" asp-area="" asp-page="/Index">Blog</a> *@
-                                                @* In case of smaller windows *@
-                                                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                                                aria-expanded="false" aria-label="Toggle navigation">
-                                                    <span class="navbar-toggler-icon"></span>
-                                                </button>
-                                                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                                                    <ul class="navbar-nav flex-grow-1">
-                                                        @for (int j = 0; j < 3; j++)
-                                                        {
-                                                            <li class="nav-item">
-                                                                <a class="nav-link text-dark btn-info rounded m-3" asp-area="" asp-page="/Index">@element.MenuTitles[j]</a>
-                                                            </li>
-                                                        }
-                                                    </ul>
+                                        @* If previewing *@
+                                        <header>
+                                            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light box-shadow mb-3">
+                                                <div class="container">
+                                                    @* <a class="navbar-brand" asp-area="" asp-page="/Index">Blog</a> *@
+                                                    @* In case of smaller windows *@
+                                                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                                                            aria-expanded="false" aria-label="Toggle navigation">
+                                                        <span class="navbar-toggler-icon"></span>
+                                                    </button>
+                                                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                                                        <ul class="navbar-nav flex-grow-1">
+                                                            @for (int j = 0; j < 3; j++)
+                                                            {
+                                                                <li class="nav-item">
+                                                                    <a class="nav-link text-dark btn-info rounded m-3" asp-area="" asp-page="/Index">@element.MenuTitles[j]</a>
+                                                                </li>
+                                                            }
+                                                        </ul>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </nav>
-                                    </header>
+                                            </nav>
+                                        </header>
 
-                                    @* If editing *@
-                                    <form method="post" enctype="multipart/form-data" class="preview">
+                                        @* If editing *@
+                                        <form method="post" enctype="multipart/form-data" class="preview">
 
-                                        @for (int t = 0; t < menuItems; t++)
-                                        {
-                                            <div class="d-inline border-4">
-                                                @if (t > 0)
-                                                {
-                                                    <a asp-route-moveIdLeft="@t" class="btn btn-primary border">←</a>
-                                                }
-                                                <input asp-for="EditMenu.MenuTitles[t]" value="@element.MenuTitles[t]" class="rounded-3 p-1"/>
+                                            @for (int t = 0; t < menuItems; t++)
+                                            {
+                                                <div class="d-inline border-4">
+                                                    @if (t > 0)
+                                                    {
+                                                        <a asp-route-moveIdLeft="@t" class="btn btn-primary border">←</a>
+                                                    }
+                                                    <input asp-for="EditMenu.MenuTitles[t]" value="@element.MenuTitles[t]" class="rounded-3 p-1" />
 
-                                                @if (t < 2)
-                                                {
-                                                    <a asp-route-moveIdRight="@(t+1)" class="btn btn-primary border">→</a>
-                                                }
-                                            </div>
-                                        }
+                                                    @if (t < 2)
+                                                    {
+                                                        <a asp-route-moveIdRight="@(t+1)" class="btn btn-primary border">→</a>
+                                                    }
+                                                </div>
+                                            }
 
-                                        @* @for (int t = 0; t < menuItems; t++)
+                                            @* @for (int t = 0; t < menuItems; t++)
                                         {
                                             <select asp-for="Site.Title"
                                                     class="form-control"
                                                     asp-items="Html.GetEnumSelectList<ElementTypes>()">
                                             </select>
                                         } *@
-                                        <input asp-for="EditMenu.Id" value="@element.Id" hidden="hidden" />
-                                        <input asp-for="EditMenu.SiteId" value="@element.SiteId" hidden="hidden" />
-                                        <input asp-for="EditMenu.Position" value="@element.Position" hidden="hidden" />
+                                            <input asp-for="EditMenu.Id" value="@element.Id" hidden="hidden" />
+                                            <input asp-for="EditMenu.SiteId" value="@element.SiteId" hidden="hidden" />
+                                            <input asp-for="EditMenu.Position" value="@element.Position" hidden="hidden" />
 
-                                        <a asp-route-removeElement="@element.Id" class="btn btn-danger float-end border">X</a>
-                                        <input type="submit" class="btn btn-success float-end border" value="✓" />
-                                    </form>
+                                            <a asp-route-removeElement="@element.Id" class="btn btn-danger float-end border">X</a>
+                                            <input type="submit" class="btn btn-success float-end border" value="✓" />
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
+                            }
                         }
+                        
 
                         <br />
 
@@ -204,24 +218,28 @@
                 @* <button onclick="changeFontColor()" class="btn btn-info"> Change Font Color </button> *@
 
                 <div><br /><br /></div>
+                <div>
+                    <label asp-for="ElementTypes">Lägg till element</label>
+                    <select asp-for="ElementTypes"
+                            onchange="selectElement(@site.Id)"
+                            id="@selectedElement"
+                            name="@selectedElement"
+                            class="form-control"
+                            asp-items="Html.GetEnumSelectList<ElementTypes>()">
+                    </select>
+                </div>
                 
-                <label asp-for="ElementTypes">Lägg till element</label>
-                <select asp-for="ElementTypes"
-                onchange="selectElement()"
-                id="selectedElement"
-                class="form-control"
-                asp-items="Html.GetEnumSelectList<ElementTypes>()">
-                </select>
                 <div><br /></div>
-                <div id="content">
+                <div id="content" class="">
                     <form id="form" method="post" enctype="multipart/form-data">
-                        <input asp-for="AddTitle.Content" class="show" id="title" />
-                        <textarea asp-for="AddText.Content" cols="28" rows="5" class="visually-hidden" id="text"></textarea>
-                        <input asp-for="AddUploadedImage" class="visually-hidden" id="image" />
+                            <input asp-for="AddTitle.Content" class="show" id="title" name="@titel" />
+                        <textarea asp-for="AddText.Content" cols="28" rows="5" class="visually-hidden @site.Id" id="text" name="@text"></textarea>
+                        <input asp-for="AddUploadedImage" class="visually-hidden @site.Id" id="image" name="@image" />
+                        <input asp-for="Site.Id" value="@site.Id" hidden="hidden" />
                         @* <input asp-for="AddMenu.MenuTitles" class="visually-hidden" id="0" /> *@
                         @for(int i = 0; i < 4; i++)
                         {
-                            <input asp-for="AddMenu.MenuTitles[@i]" class="visually-hidden" id="@i" />
+                            <input asp-for="AddMenu.MenuTitles[@i]" class="visually-hidden @site.Id" id="@i" />
                         }
                         
                         @* <input asp-for="Menu.MenuTitles" class="visually-hidden" id="title2" />
@@ -251,6 +269,10 @@
 {
     <p>Du är inloggad som @User.Identity.Name</p>
     <form method="post" enctype="multipart/form-data">
+        <label asp-for="Site.Title">Namn på sidan</label>
+        <br />
+        <input asp-for="Site.Title" />
+        <br />
         <label asp-for="Title.Content">Titel</label>
         <br />
         <input asp-for="Title.Content" />
@@ -271,5 +293,3 @@ else
 {
     <div class="alert alert-danger">Du är inte inloggad ännu!</div>
 }
-
-<script src="https://www.w3schools.com/lib/w3.js"></script> 

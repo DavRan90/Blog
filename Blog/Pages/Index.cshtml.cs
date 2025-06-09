@@ -177,6 +177,14 @@ public class IndexModel : PageModel
         //await _context.SaveChangesAsync();
 
         //Site.Id = 21;
+
+        if(Site.Title != null)
+        {
+            Site.UserId = "CurrentUser";
+            Site.Date = DateTime.Now;
+            await DAL.SiteAPIManager.AddSite(Site);
+        }
+
         string fileName = "";
         if (UploadedImage != null)
         {
@@ -216,7 +224,7 @@ public class IndexModel : PageModel
 
             Element newElement = new();
             newElement.Content = AddTitle.Content;
-            newElement.SiteId = 1;
+            newElement.SiteId = Site.Id;
             newElement.ElementType = ElementTypes.Title;
             newElement.Position = _context.Elements.Count() + 1;
             await DAL.ElementAPIManager.AddElement(newElement);
@@ -226,7 +234,7 @@ public class IndexModel : PageModel
         {
             Element newElement = new();
             newElement.Content = AddText.Content;
-            newElement.SiteId = 1;
+            newElement.SiteId = Site.Id;
             newElement.ElementType = ElementTypes.Text;
             newElement.Position = _context.Elements.Count() + 1;
             await DAL.ElementAPIManager.AddElement(newElement);
@@ -242,7 +250,7 @@ public class IndexModel : PageModel
             }
             Element newElement = new();
             newElement.Content = fileAddName;
-            newElement.SiteId = 1;
+            newElement.SiteId = Site.Id;
             newElement.ElementType = ElementTypes.Image;
             newElement.Position = _context.Elements.Count() + 1;
 
@@ -256,7 +264,7 @@ public class IndexModel : PageModel
         {
             Element newElement = new();
             newElement.Content = AddImage.Content;
-            newElement.SiteId = 1;
+            newElement.SiteId = Site.Id;
             newElement.ElementType = ElementTypes.Image;
             newElement.Position = _context.Elements.Count() + 1;
             await DAL.ElementAPIManager.AddElement(newElement);
@@ -275,7 +283,7 @@ public class IndexModel : PageModel
 
                 newMenu.Position = _context.Elements.Count() + 1;
                 newMenu.ElementType = ElementTypes.Menu;
-                newMenu.SiteId = 1;
+                newMenu.SiteId = Site.Id;
 
                 await DAL.ElementAPIManager.AddElement(newMenu);
             }
