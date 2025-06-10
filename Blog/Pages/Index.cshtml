@@ -30,6 +30,7 @@
             image = $"image{site.Id}";
             menu = $"menu{site.Id}";
             selectedElement = $"selectedElement{site.Id}";
+            var elementsCount = Model.Elements.Where(e => e.SiteId == site.Id).Count();
             <div class="card m-2 cardsize" id="site">
                 <a asp-route-removeSite="@site.Id" class="btn btn-danger float-end">Ta bort sida</a>
                 <h2 class="">SiteId: @site.Id</h2>
@@ -40,10 +41,10 @@
 
                 <input type="button" class="btn btn-info float-end" id="previewBtn" onclick="preview()" value="Förhandsgranska" />
                 <div><br /><br /></div>
-
+                
                 <div class="card m-2" id="page" style="background:@site.BackgroundColorString; color:@site.FontColorString; font-family:@site.FontFamilyString">
 
-                    @for (int i = 1; i <= Model.Elements.Count(); i++)
+                    @for (int i = 1; i <= elementsCount; i++)
                     {
                         var element = Model.Elements.Where(e => e.Position == i && e.SiteId == site.Id).SingleOrDefault();
                         if (element != null)
@@ -142,13 +143,13 @@
                                                 <div class="d-inline border-4">
                                                     @if (t > 0)
                                                     {
-                                                        <a asp-route-moveIdLeft="@t" class="btn btn-primary border">←</a>
+                                                        <a asp-route-siteId="@site.Id" asp-route-moveIdLeft="@t" class="btn btn-primary border">←</a>
                                                     }
                                                     <input asp-for="EditMenu.MenuTitles[t]" value="@element.MenuTitles[t]" class="rounded-3 p-1" />
 
                                                     @if (t < 2)
                                                     {
-                                                        <a asp-route-moveIdRight="@(t+1)" class="btn btn-primary border">→</a>
+                                                        <a asp-route-siteId="@site.Id" asp-route-moveIdRight="@(t+1)" class="btn btn-primary border">→</a>
                                                     }
                                                 </div>
                                             }
