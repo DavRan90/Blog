@@ -4,6 +4,7 @@ using Blog.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Blog.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250610061813_AddedMenuLinks")]
+    partial class AddedMenuLinks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,6 +37,11 @@ namespace Blog.Data.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "content");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
 
                     b.Property<int>("ElementType")
                         .HasColumnType("int")
@@ -61,7 +69,11 @@ namespace Blog.Data.Migrations
 
                     b.ToTable("Elements");
 
-                    b.HasAnnotation("Relational:JsonPropertyName", "elements");
+                    b.HasDiscriminator().HasValue("Element");
+
+                    b
+                        .UseTphMappingStrategy()
+                        .HasAnnotation("Relational:JsonPropertyName", "elements");
                 });
 
             modelBuilder.Entity("Blog.Models.Site", b =>
@@ -302,6 +314,13 @@ namespace Blog.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Blog.Models.Menu", b =>
+                {
+                    b.HasBaseType("Blog.Models.Element");
+
+                    b.HasDiscriminator().HasValue("Menu");
                 });
 
             modelBuilder.Entity("Blog.Models.Element", b =>

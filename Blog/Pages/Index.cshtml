@@ -16,14 +16,14 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Bloggen</h1>
+    <h1 class="display-4">Skapa din egen hemsida</h1>
 
 </div>
 
 <div class="row">
-    @if (Model.Sites != null)
+    @if (Model.Sites != null && user != null)
     {
-        foreach (var site in Model.Sites)
+        foreach (var site in Model.Sites.Where(s => s.UserId == user.Id))
         {
             titel = $"title{site.Id}";
             text = $"text{site.Id}";
@@ -31,38 +31,40 @@
             menu = $"menu{site.Id}";
             selectedElement = $"selectedElement{site.Id}";
             <div class="card m-2 cardsize" id="site">
+                <a asp-route-removeSite="@site.Id" class="btn btn-danger float-end">Ta bort sida</a>
                 <h2 class="">SiteId: @site.Id</h2>
                 <h2>Sitename: @site.Title</h2>
                 <h2>Sitecolor: @site.BackgroundColorString</h2>
                 <h2>Fontcolor: @site.FontColorString</h2>
-                <input type="button" class="btn btn-info float-end" id="previewBtn" onclick="preview()" value="Preview" />
+                <h2>Sitefont: @site.FontFamilyString</h2>
+
+                <input type="button" class="btn btn-info float-end" id="previewBtn" onclick="preview()" value="Förhandsgranska" />
                 <div><br /><br /></div>
 
-                <div class="card m-2" id="page" style="background:@site.BackgroundColorString; color:@site.FontColorString; font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">
-                    @* @foreach (var element in Model.Elements) *@
+                <div class="card m-2" id="page" style="background:@site.BackgroundColorString; color:@site.FontColorString; font-family:@site.FontFamilyString">
+
                     @for (int i = 1; i <= Model.Elements.Count(); i++)
                     {
                         var element = Model.Elements.Where(e => e.Position == i && e.SiteId == site.Id).SingleOrDefault();
-                        if(element != null)
+                        if (element != null)
                         {
                             if (element.ElementType == ElementTypes.Image)
                             {
-                                <a asp-route-moveIdUp="@i" class="btn btn-primary">↑</a>
+                                <a asp-route-moveIdUp="@element.Id" class="btn btn-primary">↑</a>
                                 <img class="card-img-top" src="~/userImages/@element.Content" />
 
-                                <a asp-route-moveIdDown="@i" class="btn btn-primary">↓</a>
+                                <a asp-route-moveIdDown="@element.Id" class="btn btn-primary">↓</a>
                                 <a asp-route-removeElement="@element.Id" class="btn btn-danger">X</a>
                                 <br />
                             }
-                            @* <div class="card-body"> *@
 
                             else if (element.ElementType == ElementTypes.Title)
                             {
 
                                 <div class="border border-4">
                                     <div class="container p-3 border">
-                                        <a asp-route-moveIdUp="@i" class="btn btn-primary border preview">↑</a>
-                                        <a asp-route-moveIdDown="@i" class="btn btn-primary border preview">↓</a>
+                                        <a asp-route-moveIdUp="@element.Id" class="btn btn-primary border preview">↑</a>
+                                        <a asp-route-moveIdDown="@element.Id" class="btn btn-primary border preview">↓</a>
                                         <br class="preview" /><br class="preview" />
 
                                         <h2>@element.Content</h2>
@@ -81,8 +83,8 @@
                             {
                                 <div class="border border-4">
                                     <div class="container p-3 border">
-                                        <a asp-route-moveIdUp="@i" class="btn btn-primary border preview">↑</a>
-                                        <a asp-route-moveIdDown="@i" class="btn btn-primary border preview">↓</a>
+                                        <a asp-route-moveIdUp="@element.Id" class="btn btn-primary border preview">↑</a>
+                                        <a asp-route-moveIdDown="@element.Id" class="btn btn-primary border preview">↓</a>
                                         <br class="preview" /><br class="preview" />
 
                                         @* If previewing *@
@@ -105,18 +107,17 @@
                             {
                                 <div class="border border-4">
                                     <div class="container p-3 border">
-                                        <a asp-route-moveIdUp="@i" class="btn btn-primary border preview">↑</a>
-                                        <a asp-route-moveIdDown="@i" class="btn btn-primary border preview">↓</a>
+                                        <a asp-route-moveIdUp="@element.Id" class="btn btn-primary border preview">↑</a>
+                                        <a asp-route-moveIdDown="@element.Id" class="btn btn-primary border preview">↓</a>
                                         <br class="preview" /><br class="preview" />
 
                                         @* If previewing *@
                                         <header>
                                             <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light box-shadow mb-3">
                                                 <div class="container">
-                                                    @* <a class="navbar-brand" asp-area="" asp-page="/Index">Blog</a> *@
                                                     @* In case of smaller windows *@
                                                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                                                    aria-expanded="false" aria-label="Toggle navigation">
+                                                            aria-expanded="false" aria-label="Toggle navigation">
                                                         <span class="navbar-toggler-icon"></span>
                                                     </button>
                                                     <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
@@ -151,14 +152,19 @@
                                                     }
                                                 </div>
                                             }
-
-                                            @* @for (int t = 0; t < menuItems; t++)
-                                        {
-                                            <select asp-for="Site.Title"
-                                                    class="form-control"
-                                                    asp-items="Html.GetEnumSelectList<ElementTypes>()">
-                                            </select>
-                                        } *@
+                                            <br />
+                                            @for (int t = 0; t < menuItems; t++)
+                                            {
+                                                <div class="d-inline border-4">
+                                                    <select asp-for="EditMenu.MenuLinks[t]"
+                                                            id="menuLinks"
+                                                            asp-items="Model.IPages"
+                                                            
+                                                            class="form-select dropdownsize d-inline">                                                        
+                                                        <option disabled selected>--Välj sida att länka--</option>
+                                                    </select>
+                                                </div>
+                                            }
                                             <input asp-for="EditMenu.Id" value="@element.Id" hidden="hidden" />
                                             <input asp-for="EditMenu.SiteId" value="@element.SiteId" hidden="hidden" />
                                             <input asp-for="EditMenu.Position" value="@element.Position" hidden="hidden" />
@@ -170,24 +176,11 @@
                                 </div>
                             }
                         }
-
-
                         <br />
-
-
-                        @* @if (user != null && user.Id == element.UserId)
-                    {
-                        <a asp-route-deleteId="@site.Id" class="btn btn-primary">Ta bort</a>
-                    } *@
-                        @* </div> *@
-                        @* <p class="card-footer">@site.Date</p> *@
                     }
-
                 </div>
-
                 <div><br /><br /></div>
-                <h5>Choose a background color</h5>
-                @* <input id="colorpickerbg" type="color" value="#ffffff" onchange="changeBackgroundColor()"> *@
+                <h5>Välj bakgrundsfärg</h5>
                 <form method="post" enctype="multipart/form-data">
                     <input asp-for="Site.BackgroundColorString" value="@site.BackgroundColorString" type="color" id="colorpickerbg" onchange="changeBackgroundColor()" />
                     <input asp-for="Site.Id" value="@site.Id" hidden="hidden" />
@@ -197,8 +190,7 @@
 
                 <div><br /></div>
 
-                <h5>Choose a font color</h5>
-                @* <input id="colorpickerfont" type="color" value="#ffffff" onchange="changeFontColor()"> *@
+                <h5>Välj textfärg</h5>
                 <form method="post" enctype="multipart/form-data">
                     <input asp-for="Site.FontColorString" type="color" id="colorpickerfont" value="@site.FontColorString" onchange="changeFontColor()" />
                     <input asp-for="Site.Id" value="@site.Id" hidden="hidden" />
@@ -208,26 +200,28 @@
 
                 <div><br /></div>
 
-                <h5>Choose a font style</h5>
-                @* Should be a select dropdown *@
-                <input id="fontpicker" type="color" value="#ffffff" onchange="changeFontColor()">
+                <h5>Välj typsnitt</h5>
                 <form method="post" enctype="multipart/form-data">
-                    <select asp-for="Site.FontFamilyString" type="color" id="color" value="@site.FontFamilyString" />
+                    <select asp-for="Site.FontFamilyString"
+                            id="fontFamily"
+                            asp-items="Model.IFonts"
+                            class="form-select dropdownsize d-inline">
+                        <option disabled selected>--Välj font--</option>
+                    </select>
                     <input asp-for="Site.Id" value="@site.Id" hidden="hidden" />
                     <br /><br />
                     <button onclick="" class="btn btn-info w-25"> Save Font Style </button>
                 </form>
-                @* <button onclick="changeFontColor()" class="btn btn-info"> Change Font Color </button> *@
 
                 <div><br /><br /></div>
                 <div>
                     <label asp-for="ElementTypes">Lägg till element</label>
                     <select asp-for="ElementTypes"
-                    onchange="selectElement(@site.Id)"
-                    id="@selectedElement"
-                    name="@selectedElement"
-                    class="form-control"
-                    asp-items="Html.GetEnumSelectList<ElementTypes>()">
+                            onchange="selectElement(@site.Id)"
+                            id="@selectedElement"
+                            name="@selectedElement"
+                            class="form-control"
+                            asp-items="Html.GetEnumSelectList<ElementTypes>()">
                     </select>
                 </div>
 
@@ -236,22 +230,14 @@
                     <form id="form" method="post" enctype="multipart/form-data">
                         <input asp-for="AddTitle.Content" class="show" id="@titel" />
                         <textarea asp-for="AddText.Content" cols="28" rows="5" class="visually-hidden" id="@text"></textarea>
-                        <input asp-for="AddUploadedImage" class="visually-hidden" id="@image"/>
+                        <input asp-for="AddUploadedImage" class="visually-hidden" id="@image" />
                         <input asp-for="Site.Id" value="@site.Id" hidden="hidden" />
 
-                        @for(int i = 0; i < 4; i++)
+                        @for (int i = 0; i < 4; i++)
                         {
                             menuOption = (menu + i);
                             <input asp-for="AddMenu.MenuTitles[@i]" class="visually-hidden" id="@menuOption" />
-                            @* <input asp-for="AddMenu.MenuTitles[@i]" class="visually-hidden" id="@i" /> *@
                         }
-
-                        @* <select asp-for="Menu.NumberOfTitles"
-                                onchange="selectMenuItems()"
-                                id="menuBar"
-                                class="form-control visually-hidden"
-                                asp-items="Html.GetEnumSelectList<ElementTypes>()">
-                        </select> *@
                         <br /><br />
                         <input type="submit" class="btn btn-primary" value="Lägg till element" />
                     </form>
@@ -269,25 +255,12 @@
 @if (SignInManager.IsSignedIn(User))
 {
     <p>Du är inloggad som @User.Identity.Name</p>
+    <h2>Lägg till sida</h2>
     <form method="post" enctype="multipart/form-data">
         <label asp-for="Site.Title">Namn på sidan</label>
         <br />
         <input asp-for="Site.Title" />
-        <br />
-        <label asp-for="Title.Content">Titel</label>
-        <br />
-        <input asp-for="Title.Content" />
-        <br />
-        <label asp-for="Text.Content">Text</label>
-        <br />
-        <textarea asp-for="Text.Content" cols="40" rows="5"></textarea>
-        <br />
-        <label asp-for="Image.Content">Bild</label>
-        <br />
-        <input asp-for="UploadedImage" />
-
-        <br /><br />
-        <input type="submit" class="btn-success" value="Spara inlägget" />
+        <input type="submit" class="btn-success" value="Starta sidan" />
     </form>
 }
 else

@@ -41,3 +41,8 @@ body {
 .myBG {
     background-color = #ff8000;
 }
+
+.dropdownsize {
+    width: 183px;
+    margin-right: 92px;
+}

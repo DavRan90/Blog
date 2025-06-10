@@ -1,6 +1,7 @@
 using Blog.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Runtime.CompilerServices;
@@ -68,14 +69,83 @@ public class IndexModel : PageModel
     public ElementTypes ElementTypes { get; set; }
 
     public List<Models.Site> Sites { get; set; }
-
+    public IEnumerable<SelectListItem> IPages { get; set; }
+    public IEnumerable<SelectListItem> IFonts { get; set; }
+    public FontSelect Fonts { get; set; }
+    public SelectListItem Item { get; set; }
+    public List<string> MyPagesList { get; set; }
+    public MyPages MyPages { get; set; }
     public List<Models.Element> Elements { get; set; }
 
+    dynamic ViewBag = new System.Dynamic.ExpandoObject();
 
-    public async Task OnGetAsync(int deleteId, int moveIdUp, int moveIdDown, int moveIdLeft, int moveIdRight, int removeElement, int editElement)
+
+    public void PopulateOptionsList(string user)
+    {
+        IEnumerable<SelectListItem> GetOptions =
+            _context.Sites.Where(s => s.UserId == user).Select(s => new SelectListItem
+            {
+                Text = s.Title,
+                Value = s.Id.ToString()
+            });
+        IPages = GetOptions;
+        //ViewBag.OptionsList = GetOptions;
+    }
+
+    public void PopulateFontsList()
+    {
+        IEnumerable<SelectListItem> GetFonts =
+            Fonts.FontFamilies.Select(s => new SelectListItem
+            {
+                Text = s.Value,
+                Value = s.Value
+            });
+        IFonts = GetFonts;
+    }
+
+    public IEnumerable<SelectListItem> GetSites()
+    {
+        List<string> myPages = new();
+        foreach (var site in Sites)
+        {
+            myPages.Add(site.Title);
+        }
+        return (IEnumerable<SelectListItem>)myPages;
+
+    }
+    public async Task OnGetAsync(int deleteId, int moveIdUp, int moveIdDown, int moveIdLeft, int moveIdRight, int removeElement, int editElement, int removeSite)
     {
         Sites = await DAL.SiteAPIManager.GetAllSites();
         Elements = await DAL.ElementAPIManager.GetAllElements();
+        Fonts = new FontSelect();
+        //foreach (var site in Sites)
+        //{
+        //    MyPages.Pages.Add(site.Title);
+        //}
+        if(User.FindFirstValue(ClaimTypes.NameIdentifier) != null)
+        {
+            PopulateOptionsList(User.FindFirstValue(ClaimTypes.NameIdentifier).ToString());
+        }
+        
+        PopulateFontsList();
+
+
+        //Item.Text = "Text";
+        //Item.Value = "Value";
+        //IPages.Append(Item);
+
+        //Option = GetOptions();
+
+        //IEnumerable<SelectListItem> ListPages =
+        //    Elements.Select(i => new SelectListItem
+        //    {
+        //        Text = "Text 1",
+        //        Value = "Value 1"
+        //    });
+
+        //Pages = ListPages;
+
+
 
         //Elements = await _context.Elements.ToListAsync();
         //Sites = await _context.Sites.ToListAsync();
@@ -83,14 +153,14 @@ public class IndexModel : PageModel
 
         if (removeElement > 0)
         {
-            await DAL.ElementAPIManager.DeleteElement(removeElement);
+            
             //Models.Element elementToBeRemoved = await _context.Elements.Where(e => e.Id == removeElement).SingleOrDefaultAsync();
             //_context.Elements.Remove(elementToBeRemoved);
             //await _context.SaveChangesAsync();
 
 
             // Re-arrange positions
-            List<Models.Element> listOfElements = await _context.Elements.OrderBy(e => e.Position).ToListAsync();
+            List<Models.Element> listOfElements = await _context.Elements.Where(e => e.SiteId == Site.Id).OrderBy(e => e.Position).ToListAsync();
             int index = 1;
             foreach (var element in listOfElements)
             {
@@ -100,21 +170,31 @@ public class IndexModel : PageModel
             await _context.SaveChangesAsync();
         }
 
+        if(removeSite > 0)
+        {
+            List<Models.Element> elementsToBeRemoved = await _context.Elements.Where(e => e.SiteId == removeSite).ToListAsync();
+            foreach(var element in elementsToBeRemoved)
+            {
+                await DAL.ElementAPIManager.DeleteElement(element.Id);
+            }
+            await DAL.SiteAPIManager.DeleteSite(removeSite);
+        }
+
         
 
-        if (moveIdDown > 0 && moveIdDown < _context.Elements.Count())
+        if (moveIdDown > 0 /*&& moveIdDown < _context.Elements.Count()*/)
         {
-            Models.Element elementToBeMoved = await _context.Elements.Where(e => e.Position == moveIdDown).SingleOrDefaultAsync();
-            Models.Element elementAtNewPosition = await _context.Elements.Where(e => e.Position == moveIdDown + 1).SingleOrDefaultAsync();
+            Models.Element elementToBeMoved = await _context.Elements.Where(e => e.Id == moveIdDown).SingleOrDefaultAsync();
+            Models.Element elementAtNewPosition = await _context.Elements.Where(e => e.SiteId == elementToBeMoved.SiteId && e.Position == elementToBeMoved.Position + 1).SingleOrDefaultAsync();
             elementToBeMoved.Position += 1;
             elementAtNewPosition.Position -= 1;
             await _context.SaveChangesAsync();
         }
 
-        if (moveIdUp >= 1 && moveIdUp <= _context.Elements.Count())
+        if (moveIdUp > 0 /*&& moveIdUp <= _context.Elements.Count()*/)
         {
-            Models.Element elementToBeMoved = await _context.Elements.Where(e => e.Position == moveIdUp).SingleOrDefaultAsync();
-            Models.Element elementAtNewPosition = await _context.Elements.Where(e => e.Position == moveIdUp - 1).SingleOrDefaultAsync();
+            Models.Element elementToBeMoved = await _context.Elements.Where(e => e.Id == moveIdUp).SingleOrDefaultAsync();
+            Models.Element elementAtNewPosition = await _context.Elements.Where(e => e.SiteId == elementToBeMoved.SiteId && e.Position == elementToBeMoved.Position - 1).SingleOrDefaultAsync();
             elementToBeMoved.Position -= 1;
             elementAtNewPosition.Position += 1;
             await _context.SaveChangesAsync();
@@ -124,7 +204,10 @@ public class IndexModel : PageModel
         {
             var menu = await _context.Elements.Where(e => e.ElementType == ElementTypes.Menu).SingleOrDefaultAsync();
             var menuItemToMove = menu.MenuTitles[moveIdLeft];
+            var menuLinksToMove = menu.MenuLinks[moveIdLeft];
+            menu.MenuLinks.RemoveAt(moveIdLeft);
             menu.MenuTitles.RemoveAt(moveIdLeft);
+            menu.MenuLinks.Insert(moveIdLeft - 1, menuLinksToMove);
             menu.MenuTitles.Insert(moveIdLeft-1, menuItemToMove);
             await _context.SaveChangesAsync();
         }
@@ -134,13 +217,17 @@ public class IndexModel : PageModel
             moveIdRight--; // eftersom jag inte vill skicka in ett 0-värde
             var menu = await _context.Elements.Where(e => e.ElementType == ElementTypes.Menu).SingleOrDefaultAsync();
             var menuItemToMove = menu.MenuTitles[moveIdRight];
+            var menuLinksToMove = menu.MenuLinks[moveIdRight];
+            menu.MenuLinks.RemoveAt(moveIdRight);
             menu.MenuTitles.RemoveAt(moveIdRight);
+            menu.MenuLinks.Insert(moveIdRight + 1, menuLinksToMove);
             menu.MenuTitles.Insert(moveIdRight + 1, menuItemToMove);
             await _context.SaveChangesAsync();
         }
 
         Sites = await DAL.SiteAPIManager.GetAllSites();
         Elements = await DAL.ElementAPIManager.GetAllElements();
+        //PopulateList();
         //if (deleteId != 0)
         //{
         //    Models.Site siteToBeDeleted = await _context.Sites.FindAsync(deleteId);
@@ -182,6 +269,7 @@ public class IndexModel : PageModel
         {
             Site.UserId = "CurrentUser";
             Site.Date = DateTime.Now;
+            Site.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             await DAL.SiteAPIManager.AddSite(Site);
         }
 
@@ -194,7 +282,7 @@ public class IndexModel : PageModel
                 await UploadedImage.CopyToAsync(fileStream);
             }
             Image.Content = fileName;
-            Image.Position = _context.Elements.Count() + 1;
+            Image.Position = _context.Elements.Where(e => e.Id == Site.Id).Count() + 1;
             Image.SiteId = Site.Id;
             _context.Elements.Add(Image);
             await _context.SaveChangesAsync();
@@ -206,19 +294,20 @@ public class IndexModel : PageModel
         {
 
             Title.SiteId = Site.Id;
-            Title.Position = _context.Elements.Count() + 1;
+            Title.Position = _context.Elements.Where(e => e.Id == Site.Id).Count() + 1;
             _context.Elements.Add(Title);
             await _context.SaveChangesAsync();
         }
 
         // Add Text
-        //if (Text.Content != null)
-        //{
-        //    Text.SiteId = Site.Id;
-        //    Text.Position = _context.Elements.Count() + 1;
-        //    _context.Elements.Add(Text);
-        //    await _context.SaveChangesAsync();
-        //}
+        if (Text.Content != null)
+        {
+            Text.SiteId = Site.Id;
+            Text.Position = _context.Elements.Where(e => e.SiteId == Site.Id).Count() + 1;
+            _context.Elements.Add(Text);
+            await _context.SaveChangesAsync();
+        }
+
         if (AddTitle.Content != null)
         {
 
@@ -226,7 +315,7 @@ public class IndexModel : PageModel
             newElement.Content = AddTitle.Content;
             newElement.SiteId = Site.Id;
             newElement.ElementType = ElementTypes.Title;
-            newElement.Position = _context.Elements.Count() + 1;
+            newElement.Position = _context.Elements.Where(e => e.SiteId == Site.Id).Count() + 1;
             await DAL.ElementAPIManager.AddElement(newElement);
         }
 
@@ -236,7 +325,7 @@ public class IndexModel : PageModel
             newElement.Content = AddText.Content;
             newElement.SiteId = Site.Id;
             newElement.ElementType = ElementTypes.Text;
-            newElement.Position = _context.Elements.Count() + 1;
+            newElement.Position = _context.Elements.Where(e => e.SiteId == Site.Id).Count() + 1;
             await DAL.ElementAPIManager.AddElement(newElement);
         }
 
@@ -252,7 +341,7 @@ public class IndexModel : PageModel
             newElement.Content = fileAddName;
             newElement.SiteId = Site.Id;
             newElement.ElementType = ElementTypes.Image;
-            newElement.Position = _context.Elements.Count() + 1;
+            newElement.Position = _context.Elements.Where(e => e.SiteId == Site.Id).Count() + 1;
 
             await DAL.ElementAPIManager.AddElement(newElement);
             //_context.Elements.Add(Image);
@@ -266,7 +355,7 @@ public class IndexModel : PageModel
             newElement.Content = AddImage.Content;
             newElement.SiteId = Site.Id;
             newElement.ElementType = ElementTypes.Image;
-            newElement.Position = _context.Elements.Count() + 1;
+            newElement.Position = _context.Elements.Where(e => e.SiteId == Site.Id).Count() + 1;
             await DAL.ElementAPIManager.AddElement(newElement);
         }
 
@@ -281,7 +370,7 @@ public class IndexModel : PageModel
                     newMenu.MenuTitles.Add(AddMenu.MenuTitles[i]);
                 }
 
-                newMenu.Position = _context.Elements.Count() + 1;
+                newMenu.Position = _context.Elements.Where(e => e.SiteId == Site.Id).Count() + 1;
                 newMenu.ElementType = ElementTypes.Menu;
                 newMenu.SiteId = Site.Id;
 
@@ -327,7 +416,24 @@ public class IndexModel : PageModel
             await DAL.ElementAPIManager.UpdateElement(newElement);
         }
 
-        if(!Site.BackgroundColorString.IsNullOrEmpty())
+        if (!EditMenu.MenuLinks.IsNullOrEmpty())
+        {
+            Element newElement = new();
+            var existingElement = await _context.Elements.Where(e => e.Id == EditMenu.Id).SingleOrDefaultAsync();
+            newElement.MenuTitles = existingElement.MenuTitles;
+            newElement.Id = EditMenu.Id;
+
+            for (int i = 0; i < 3; i++)
+            {
+                newElement.MenuLinks.Add(EditMenu.MenuLinks[i].ToString());
+            }
+            newElement.SiteId = EditMenu.SiteId;
+            newElement.ElementType = ElementTypes.Menu;
+            newElement.Position = EditMenu.Position;
+            await DAL.ElementAPIManager.UpdateElement(newElement);
+        }
+
+        if (!Site.BackgroundColorString.IsNullOrEmpty())
         {
             var siteToBeEdited = await _context.Sites.Where(s => s.Id == Site.Id).SingleOrDefaultAsync();
             siteToBeEdited.BackgroundColorString = Site.BackgroundColorString;
@@ -338,6 +444,13 @@ public class IndexModel : PageModel
         {
             var siteToBeEdited = await _context.Sites.Where(s => s.Id == Site.Id).SingleOrDefaultAsync();
             siteToBeEdited.FontColorString = Site.FontColorString;
+            await DAL.SiteAPIManager.UpdateSite(siteToBeEdited);
+        }
+
+        if (!Site.FontFamilyString.IsNullOrEmpty())
+        {
+            var siteToBeEdited = await _context.Sites.Where(s => s.Id == Site.Id).SingleOrDefaultAsync();
+            siteToBeEdited.FontFamilyString = Site.FontFamilyString;
             await DAL.SiteAPIManager.UpdateSite(siteToBeEdited);
         }
 

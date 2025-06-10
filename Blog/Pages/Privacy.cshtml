@@ -1,25 +1,41 @@
 ﻿@page
 @model PrivacyModel
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
 @{
     ViewData["Title"] = "Privacy Policy";
+    var user = await UserManager.GetUserAsync(User);
+    // var site = Model.SiteToShow;
 }
-
+<div class="text-center">
+    <h1 class="display-4">Granska hemsidan</h1>
+</div>
 <div class="row">
-    @if (Model.Sites != null)
+    @if (Model.SiteToShow != null && user != null)
     {
-        foreach (var site in Model.Sites)
-        {
+        @* var site = Model.Sites.Where(s => s.Id == 1).SingleOrDefault(); *@
+        @* if(user.Id == Model.SiteToShow.UserId) *@
+        
+            var site = Model.SiteToShow;
+        
+        
+        var elementsCount = Model.Elements.Where(e => e.SiteId == site.Id).Count();
+        @* foreach (var site in Model.Sites)
+        { *@
             <div class="card m-2 cardsize" id="site">
-                <h2 class="">SiteId: @Model.Sites[0].Id</h2>
-                <h2>Sitename: @Model.Sites[0].Title</h2>
-                <h2>Sitecolor: @Model.Sites[0].BackgroundColorString</h2>
-                <div><br /><br /></div>
+            <h2 class="">SiteId: @site.Id</h2>
+            <h2>Sitename: @site.Title</h2>
+            <h2>Sitecolor: @site.BackgroundColorString</h2>
+            <h2>Sitefont: @site.FontFamilyString</h2>
 
-                <div class="card m-2" id="page" style="background:@site.BackgroundColorString">
-                    @for (int i = 1; i <= Model.Elements.Count(); i++)
+                <div><br /><br /></div>
+            @*@Model.Fonts.FontFamilies.Where(f => f.Key == 1)*@
+            <div class="card m-2" id="page" style="background:@site.BackgroundColorString; color:@site.FontColorString; font-family:@site.FontFamilyString">
+
+                @for (int i = 1; i <= elementsCount; i++)
                     {
                         // Decide which element to show first
-                        var element = Model.Elements.Where(e => e.Position == i).SingleOrDefault();
+                        var element = Model.Elements.Where(e => e.Position == i && e.SiteId == site.Id).SingleOrDefault();
 
                         if (element.ElementType == ElementTypes.Image)
                         {
@@ -65,7 +81,8 @@
                                                         @for (int j = 0; j < 3; j++)
                                                         {
                                                             <li class="nav-item">
-                                                                <a class="nav-link text-dark btn-info rounded m-3" asp-area="" asp-page="/Index">@element.MenuTitles[j]</a>
+                                                                @* <a class="nav-link text-dark btn-info rounded m-3" asp-area="" asp-page="/Index">@element.MenuTitles[j]</a> *@
+                                                                <a asp-route-showPage="@element.MenuLinks[j]" class="nav-link text-dark btn-info rounded m-3">@element.MenuTitles[j]</a>
                                                             </li>
                                                         }
                                                     </ul>
@@ -90,6 +107,10 @@
 
                 </div>
             </div>
-        }
+        @* } *@
+    }
+    else
+    {
+        <div class="alert alert-danger">Du har inget innehåll här ännu!</div>
     }
 </div>
