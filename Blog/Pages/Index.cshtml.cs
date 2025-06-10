@@ -20,35 +20,17 @@ public class IndexModel : PageModel
     [BindProperty]
     public Models.Site Site { get; set; }
 
-    //[BindProperty]
-    //public Models.Element Element { get; set; }
-
-    [BindProperty]
-    public Models.Title Title { get; set; }
-
-    [BindProperty]
-    public Models.Text Text { get; set; }
-
-    
-
     [BindProperty]
     public Models.Text EditText { get; set; }
 
     [BindProperty]
     public Models.Title EditTitle { get; set; }
 
-    //[BindProperty]
-    //public Models.Image EditImage { get; set; }
-
     [BindProperty]
     public Models.Menu EditMenu { get; set; }
 
     [BindProperty]
     public Models.Image Image { get; set; }
-
-    [BindProperty]
-    public IFormFile UploadedImage { get; set; }
-
 
     [BindProperty]
     public IFormFile AddUploadedImage { get; set; }
@@ -203,20 +185,12 @@ public class IndexModel : PageModel
         if (AddTitle.Content != null)
         {
             Element newElement = CreateElement(AddTitle.Content, ElementTypes.Title);
-            //newElement.Content = AddTitle.Content;
-            //newElement.SiteId = Site.Id;
-            //newElement.ElementType = ElementTypes.Title;
-            //newElement.Position = _context.Elements.Where(e => e.SiteId == Site.Id).Count() + 1;
             await DAL.ElementAPIManager.AddElement(newElement);
         }
 
         if (AddText.Content != null)
         {
             Element newElement = CreateElement(AddText.Content, ElementTypes.Text);
-            //newElement.Content = AddText.Content;
-            //newElement.SiteId = Site.Id;
-            //newElement.ElementType = ElementTypes.Text;
-            //newElement.Position = _context.Elements.Where(e => e.SiteId == Site.Id).Count() + 1;
             await DAL.ElementAPIManager.AddElement(newElement);
         }
 
@@ -229,24 +203,13 @@ public class IndexModel : PageModel
                 await AddUploadedImage.CopyToAsync(fileStream);
             }
             Element newElement = CreateElement(fileAddName, ElementTypes.Image);
-            //newElement.Content = fileAddName;
-            //newElement.SiteId = Site.Id;
-            //newElement.ElementType = ElementTypes.Image;
-            //newElement.Position = _context.Elements.Where(e => e.SiteId == Site.Id).Count() + 1;
 
             await DAL.ElementAPIManager.AddElement(newElement);
-            //_context.Elements.Add(Image);
-            //await _context.SaveChangesAsync();
-            //"./wwwroot/userImages/
         }
 
         if (AddImage.Content != null)
         {
             Element newElement = CreateElement(AddImage.Content, ElementTypes.Image);
-            //newElement.Content = AddImage.Content;
-            //newElement.SiteId = Site.Id;
-            //newElement.ElementType = ElementTypes.Image;
-            //newElement.Position = _context.Elements.Where(e => e.SiteId == Site.Id).Count() + 1;
             await DAL.ElementAPIManager.AddElement(newElement);
         }
 
@@ -260,10 +223,6 @@ public class IndexModel : PageModel
                 {
                     newElement.MenuTitles.Add(AddMenu.MenuTitles[i]);
                 }
-
-                //newMenu.Position = _context.Elements.Where(e => e.SiteId == Site.Id).Count() + 1;
-                //newMenu.ElementType = ElementTypes.Menu;
-                //newMenu.SiteId = Site.Id;
 
                 await DAL.ElementAPIManager.AddElement(newElement);
             }

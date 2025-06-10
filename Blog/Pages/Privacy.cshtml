@@ -13,101 +13,82 @@
 <div class="row">
     @if (Model.SiteToShow != null && user != null)
     {
-        @* var site = Model.Sites.Where(s => s.Id == 1).SingleOrDefault(); *@
-        @* if(user.Id == Model.SiteToShow.UserId) *@
-        
-            var site = Model.SiteToShow;
-        
-        
+        var site = Model.SiteToShow;
         var elementsCount = Model.Elements.Where(e => e.SiteId == site.Id).Count();
-        @* foreach (var site in Model.Sites)
-        { *@
-            <div class="card m-2 cardsize" id="site">
+        <div class="card m-2 cardsize" id="site">
             <h2 class="">SiteId: @site.Id</h2>
             <h2>Sitename: @site.Title</h2>
             <h2>Sitecolor: @site.BackgroundColorString</h2>
             <h2>Sitefont: @site.FontFamilyString</h2>
 
-                <div><br /><br /></div>
-            @*@Model.Fonts.FontFamilies.Where(f => f.Key == 1)*@
+            <div><br /><br /></div>
+            
             <div class="card m-2" id="page" style="background:@site.BackgroundColorString; color:@site.FontColorString; font-family:@site.FontFamilyString">
 
                 @for (int i = 1; i <= elementsCount; i++)
+                {
+                    // Decide which element to show first
+                    var element = Model.Elements.Where(e => e.Position == i && e.SiteId == site.Id).SingleOrDefault();
+
+                    if (element.ElementType == ElementTypes.Image)
                     {
-                        // Decide which element to show first
-                        var element = Model.Elements.Where(e => e.Position == i && e.SiteId == site.Id).SingleOrDefault();
-
-                        if (element.ElementType == ElementTypes.Image)
-                        {
-                            <img class="card-img-top" src="~/userImages/@element.Content" />
-                            <br />
-                        }
-
-                        else if (element.ElementType == ElementTypes.Title)
-                        {
-
-                            <div class="border border-4">
-                                <div class="container p-3 border">
-                                    <h2>@element.Content</h2>
-                                </div>
-                            </div>
-                        }
-                        else if (element.ElementType == ElementTypes.Text)
-                        {
-                            <div class="border border-4">
-                                <div class="container p-3 border">
-                                    @* If previewing *@
-                                    <p class="linebreak border border-2 p-3 rounded-1">@element.Content</p>
-                                </div>
-                            </div>
-                        }
-
-                        else if (element.ElementType == ElementTypes.Menu)
-                        {
-                            <div class="border border-4">
-                                <div class="container p-3 border">
-                                    @* If previewing *@
-                                    <header>
-                                        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light box-shadow mb-3">
-                                            <div class="container">
-                                                @* <a class="navbar-brand" asp-area="" asp-page="/Index">Blog</a> *@
-                                                @* In case of smaller windows *@
-                                                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                                                        aria-expanded="false" aria-label="Toggle navigation">
-                                                    <span class="navbar-toggler-icon"></span>
-                                                </button>
-                                                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                                                    <ul class="navbar-nav flex-grow-1">
-                                                        @for (int j = 0; j < 3; j++)
-                                                        {
-                                                            <li class="nav-item">
-                                                                @* <a class="nav-link text-dark btn-info rounded m-3" asp-area="" asp-page="/Index">@element.MenuTitles[j]</a> *@
-                                                                <a asp-route-showPage="@element.MenuLinks[j]" class="nav-link text-dark btn-info rounded m-3">@element.MenuTitles[j]</a>
-                                                            </li>
-                                                        }
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </nav>
-                                    </header>
-                                </div>
-                            </div>
-                        }
-
+                        <img class="card-img-top" src="~/userImages/@element.Content" />
                         <br />
-
-
-                        @* @if (user != null && user.Id == element.UserId)
-                    {
-                        <a asp-route-deleteId="@site.Id" class="btn btn-primary">Ta bort</a>
-                    } *@
-                        @* </div> *@
-                        @* <p class="card-footer">@site.Date</p> *@
                     }
 
-                </div>
+                    else if (element.ElementType == ElementTypes.Title)
+                    {
+
+                        <div class="border border-4">
+                            <div class="container p-3 border">
+                                <h2>@element.Content</h2>
+                            </div>
+                        </div>
+                    }
+                    else if (element.ElementType == ElementTypes.Text)
+                    {
+                        <div class="border border-4">
+                            <div class="container p-3 border">
+                                @* If previewing *@
+                                <p class="linebreak border border-2 p-3 rounded-1">@element.Content</p>
+                            </div>
+                        </div>
+                    }
+
+                    else if (element.ElementType == ElementTypes.Menu)
+                    {
+                        <div class="border border-4">
+                            <div class="container p-3 border">
+                                <header>
+                                    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light box-shadow mb-3">
+                                        <div class="container">
+                                            @* In case of smaller windows *@
+                                            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                                                    aria-expanded="false" aria-label="Toggle navigation">
+                                                <span class="navbar-toggler-icon"></span>
+                                            </button>
+                                            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                                                <ul class="navbar-nav flex-grow-1">
+                                                    @for (int j = 0; j < 3; j++)
+                                                    {
+                                                        <li class="nav-item">
+                                                            <a asp-route-showPage="@element.MenuLinks[j]" class="nav-link text-dark btn-info rounded m-3">@element.MenuTitles[j]</a>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </nav>
+                                </header>
+                            </div>
+                        </div>
+                    }
+
+                    <br />
+                }
+
             </div>
-        @* } *@
+        </div>
     }
     else
     {

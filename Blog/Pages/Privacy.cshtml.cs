@@ -34,7 +34,6 @@ public class PrivacyModel : PageModel
         else
         {
             SiteToShow = Sites.Where(s => s.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier)).FirstOrDefault();
-            //SiteToShow = Sites.Where(s => s.Id == 1 && User.FindFirstValue(ClaimTypes.NameIdentifier) == s.UserId).SingleOrDefault();
         }
 
         
