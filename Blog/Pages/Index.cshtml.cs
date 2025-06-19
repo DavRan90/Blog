@@ -21,6 +21,12 @@ public class IndexModel : PageModel
     public Models.Site Site { get; set; }
 
     [BindProperty]
+    public Models.Element Element { get; set; }
+
+    [BindProperty]
+    public Models.Site EditSite { get; set; }
+
+    [BindProperty]
     public Models.Text EditText { get; set; }
 
     [BindProperty]
@@ -107,6 +113,14 @@ public class IndexModel : PageModel
         {
 
             Models.Element elementToBeRemoved = await _context.Elements.Where(e => e.Id == removeElement).SingleOrDefaultAsync();
+            if(elementToBeRemoved.ElementType == ElementTypes.Image)
+            {
+                string fileName = "./wwwroot/userImages/" + elementToBeRemoved.Content;
+                if (System.IO.File.Exists(fileName))
+                {
+                    System.IO.File.Delete(fileName);
+                }
+            }
             _context.Elements.Remove(elementToBeRemoved);
             await _context.SaveChangesAsync();
 
@@ -127,6 +141,14 @@ public class IndexModel : PageModel
             List<Models.Element> elementsToBeRemoved = await _context.Elements.Where(e => e.SiteId == removeSite).ToListAsync();
             foreach(var element in elementsToBeRemoved)
             {
+                if (element.ElementType == ElementTypes.Image)
+                {
+                    string fileName = "./wwwroot/userImages/" + element.Content;
+                    if (System.IO.File.Exists(fileName))
+                    {
+                        System.IO.File.Delete(fileName);
+                    }
+                }
                 await DAL.ElementAPIManager.DeleteElement(element.Id);
             }
             await DAL.SiteAPIManager.DeleteSite(removeSite);
@@ -298,7 +320,7 @@ public class IndexModel : PageModel
             await DAL.ElementAPIManager.UpdateElement(newElement);
         }
 
-        if (!EditMenu.MenuLinks.IsNullOrEmpty())
+        if (!Element.MenuLinks.IsNullOrEmpty())
         {
             var elementToBeEdited = await _context.Elements.Where(e => e.Id == EditMenu.Id).SingleOrDefaultAsync();
             //Element newElement = new();
@@ -308,7 +330,7 @@ public class IndexModel : PageModel
 
             for (int i = 0; i < 3; i++)
             {
-                elementToBeEdited.MenuLinks.Add(EditMenu.MenuLinks[i].ToString());
+                elementToBeEdited.MenuLinks.Add(Element.MenuLinks[i].ToString());
             }
             //newElement.SiteId = EditMenu.SiteId;
             //newElement.ElementType = ElementTypes.Menu;
@@ -334,6 +356,25 @@ public class IndexModel : PageModel
         {
             var siteToBeEdited = await _context.Sites.Where(s => s.Id == Site.Id).SingleOrDefaultAsync();
             siteToBeEdited.FontFamilyString = Site.FontFamilyString;
+            await DAL.SiteAPIManager.UpdateSite(siteToBeEdited);
+        }
+
+        if(!EditSite.Title.IsNullOrEmpty())
+        {
+            var siteToBeEdited = await _context.Sites.Where(s => s.Id == Site.Id).SingleOrDefaultAsync();
+            siteToBeEdited.Title = EditSite.Title;
+            await DAL.SiteAPIManager.UpdateSite(siteToBeEdited);
+        }
+
+        if(Site.IsStartSite == true)
+        {
+            var siteToBeEdited = await _context.Sites.Where(s => s.Id == Site.Id).SingleOrDefaultAsync();
+            foreach(var site in _context.Sites.Where(s => s.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier)))
+            {
+                site.IsStartSite = false;
+                await DAL.SiteAPIManager.UpdateSite(site);
+            }
+            siteToBeEdited.IsStartSite = true;
             await DAL.SiteAPIManager.UpdateSite(siteToBeEdited);
         }
 
