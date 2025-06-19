@@ -78,7 +78,7 @@ public class IndexModel : PageModel
             });
         IFonts = GetFonts;
     }
-    public async Task OnGetAsync(int moveIdUp, int moveIdDown, int siteId, int moveIdLeft, int moveIdRight, int removeElement, int removeSite)
+    public async Task OnGetAsync(int moveIdUp, int moveIdDown, int siteId, int moveIdLeft, int moveIdRight, int removeElement, int removeSite, int selectSite)
     {
         Sites = await DAL.SiteAPIManager.GetAllSites();
         Elements = await DAL.ElementAPIManager.GetAllElements();
@@ -91,6 +91,17 @@ public class IndexModel : PageModel
         
         PopulateFontsList();
 
+
+        if(selectSite != 0)
+        {
+            //Site = await DAL.SiteAPIManager.GetSite(selectSite);
+            Site = Sites.Where(s => s.Id == selectSite).SingleOrDefault();
+        }
+
+        else
+        {
+            Site = Sites.Where(s => s.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier) && s.IsStartSite).SingleOrDefault();
+        }
 
         if (removeElement != 0)
         {
@@ -182,6 +193,22 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Site.Title != null)
+        {
+            Site.Date = DateTime.Now;
+            Site.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if(_context.Sites.Where(s => s.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier)).Count() == 0)
+            {
+                Site.IsStartSite = true;
+            }
+            else
+            {
+                Site.IsStartSite = false;
+
+            }
+                await DAL.SiteAPIManager.AddSite(Site);
+        }
+
         if (AddTitle.Content != null)
         {
             Element newElement = CreateElement(AddTitle.Content, ElementTypes.Title);

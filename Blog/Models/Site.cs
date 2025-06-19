@@ -8,6 +8,9 @@ namespace Blog.Models
         [JsonPropertyName("id")]
         public int Id { get; set; }
 
+        [JsonPropertyName("isStartSite")]
+        public bool IsStartSite { get; set; }
+
         [JsonPropertyName("backgroundColorString")]
         public string? BackgroundColorString { get; set; }
 

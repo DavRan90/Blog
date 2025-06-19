@@ -5,6 +5,7 @@ namespace Blog.DAL
     public class ElementAPIManager
     {
         private static Uri BaseAddress = new Uri("https://localhost:7195/");
+        //private static Uri BaseAddress = new Uri("https://publiceringapi-acf2bkeghjh3dra5.northeurope-01.azurewebsites.net/");
         //private static Uri BaseAddress = new Uri("https://davidkassabokenapi-g6ayfwgdhef4amc7.northeurope-01.azurewebsites.net");
 
         public static async Task<List<Models.Element>> GetAllElements()

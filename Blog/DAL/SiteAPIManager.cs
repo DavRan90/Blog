@@ -5,6 +5,7 @@ namespace Blog.DAL
     public class SiteAPIManager
     {
         private static Uri BaseAddress = new Uri("https://localhost:7195/");
+        //private static Uri BaseAddress = new Uri("https://publicapi-hre0e9a0fqcqebhu.northeurope-01.azurewebsites.net");
         //private static Uri BaseAddress = new Uri("https://davidkassabokenapi-g6ayfwgdhef4amc7.northeurope-01.azurewebsites.net");
 
         public static async Task<List<Models.Site>> GetAllSites()
@@ -27,7 +28,7 @@ namespace Blog.DAL
 
         public static async Task<Models.Site> GetSite(int id)
         {
-            Models.Site sites = new();
+            Models.Site site = new();
             using (var client = new HttpClient())
             {
                 client.BaseAddress = BaseAddress;
@@ -35,12 +36,12 @@ namespace Blog.DAL
                 if (response.IsSuccessStatusCode)
                 {
                     string responseString = await response.Content.ReadAsStringAsync();
-                    sites = JsonSerializer.Deserialize<Models.Site>(responseString);
+                    site = JsonSerializer.Deserialize<Models.Site>(responseString);
                 }
             }
 
 
-            return sites;
+            return site;
         }
 
         public static async Task AddSite(Models.Site site)
