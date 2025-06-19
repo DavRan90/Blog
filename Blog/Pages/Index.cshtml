@@ -77,9 +77,9 @@
                             <input asp-for="Site.FontColorString" type="color" id="colorpickerfont" value="@site.FontColorString" onchange="changeFontColor()" />
                             <h2>Sitefont:</h2>
                             <select asp-for="Site.FontFamilyString"
-                            id="fontFamily"
-                            asp-items="Model.IFonts"
-                            class="form-select dropdownsize d-inline">
+                                    id="fontFamily"
+                                    asp-items="Model.IFonts"
+                                    class="form-select dropdownsize d-inline">
                                 <option disabled selected>--Välj font--</option>
                             </select>
                             <h2 class="">Startsite:</h2>
@@ -206,7 +206,7 @@
                                                         <div class="container">
                                                             @* In case of smaller windows *@
                                                             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                                                            aria-expanded="false" aria-label="Toggle navigation">
+                                                                    aria-expanded="false" aria-label="Toggle navigation">
                                                                 <span class="navbar-toggler-icon"></span>
                                                             </button>
                                                             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
@@ -316,38 +316,20 @@
 
                         <div><br /></div>
 
-                        <h5>Välj bakgrundsfärg</h5>
-                        <form method="post" enctype="multipart/form-data">
-                            <input asp-for="Site.BackgroundColorString" value="@site.BackgroundColorString" type="color" id="colorpickerbg" onchange="changeBackgroundColor()" />
-                            <input asp-for="Site.Id" value="@site.Id" hidden="hidden" />
-                            <br /><br />
-                            <button onclick="" class="btn btn-info w-25"> Save Background Color </button>
-                        </form>
-
-                        <div><br /></div>
-
-                        <h5>Välj textfärg</h5>
-                        <form method="post" enctype="multipart/form-data">
-                            <input asp-for="Site.FontColorString" type="color" id="colorpickerfont" value="@site.FontColorString" onchange="changeFontColor()" />
-                            <input asp-for="Site.Id" value="@site.Id" hidden="hidden" />
-                            <br /><br />
-                            <button onclick="" class="btn btn-info w-25"> Save Font Color </button>
-                        </form>
-
-                        <div><br /></div>
-
-                        <h5>Välj typsnitt</h5>
-                        <form method="post" enctype="multipart/form-data">
-                            <select asp-for="Site.FontFamilyString"
-                                    id="fontFamily"
-                                    asp-items="Model.IFonts"
-                                    class="form-select dropdownsize d-inline">
-                                <option disabled selected>--Välj font--</option>
-                            </select>
-                            <input asp-for="Site.Id" value="@site.Id" hidden="hidden" />
-                            <br /><br />
-                            <button onclick="" class="btn btn-info w-25"> Save Font Style </button>
-                        </form>
+                        <div id="content" class="">
+                            <form id="form" method="post" enctype="multipart/form-data">
+                                <label>Lägg till redan skapat element</label>
+                                <br />
+                                <select asp-for="Site.FontFamilyString"
+                                        id="fontFamily"
+                                        asp-items="Model.IFonts"
+                                        class="form-select dropdownsize d-inline">
+                                    <option disabled selected>--Välj font--</option>
+                                </select>
+                                <br /><br />
+                                <input type="submit" class="btn btn-primary" value="Lägg till element" />
+                            </form>
+                        </div>
 
                         <div><br /><br /></div>
 

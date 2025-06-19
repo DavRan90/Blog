@@ -59,10 +59,23 @@ public class IndexModel : PageModel
     public List<Models.Site> Sites { get; set; }
     public IEnumerable<SelectListItem> IPages { get; set; }
     public IEnumerable<SelectListItem> IFonts { get; set; }
+    public IEnumerable<SelectListItem> UserElements { get; set; }
     public FontSelect Fonts { get; set; }
     public List<Models.Element> Elements { get; set; }
 
 
+    public void PopulateUserElements(string user)
+    {
+        var sites = _context.Sites.Where(s => s.UserId == user).ToList();
+        
+        IEnumerable<SelectListItem> GetUserElements =
+            _context.Elements.Where(e => e.SiteId == sites[0].Id).Select(e => new SelectListItem
+            {
+                Text = e.Content,
+                Value = e.Id.ToString()
+            });
+        IPages = GetUserElements;
+    }
     public void PopulateOptionsList(string user)
     {
         IEnumerable<SelectListItem> GetOptions =
